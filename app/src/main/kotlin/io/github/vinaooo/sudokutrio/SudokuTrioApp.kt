@@ -18,9 +18,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.vinaooo.sudokutrio.core.ads.AdBannerProvider
 import io.github.vinaooo.sudokutrio.feature.game.ui.GameRoute as GameScreenRoute
+import io.github.vinaooo.sudokutrio.feature.scores.ScoresRoute as ScoresScreenRoute
+import io.github.vinaooo.sudokutrio.feature.settings.SettingsRoute as SettingsScreenRoute
 import io.github.vinaooo.sudokutrio.navigation.GameRoute
+import io.github.vinaooo.sudokutrio.navigation.ScoresRoute
+import io.github.vinaooo.sudokutrio.navigation.SettingsRoute
 
-/** The navigation host. Only the game screen carries the ad banner, at its bottom. */
+/** The navigation host. Only the game screen carries the ad banner, at its bottom; Scores and Settings have none. */
 @Composable
 fun SudokuTrioApp(adBanner: AdBannerProvider, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
@@ -33,9 +37,17 @@ fun SudokuTrioApp(adBanner: AdBannerProvider, modifier: Modifier = Modifier) {
             Column {
                 // The banner pads for the navigation bar, so the game above it must not pad for it again.
                 val navigationBar = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-                Box(Modifier.weight(1f).consumeWindowInsets(navigationBar)) { GameScreenRoute() }
+                Box(Modifier.weight(1f).consumeWindowInsets(navigationBar)) {
+                    GameScreenRoute(
+                        onOpenScores = { navController.navigate(ScoresRoute) },
+                        onOpenSettings = { navController.navigate(SettingsRoute) },
+                    )
+                }
                 adBanner.Banner(Modifier.navigationBarsPadding())
             }
         }
+        composable<ScoresRoute> { ScoresScreenRoute(onBack = navController::popBackStack) }
+        // Privacy options arrive with the consent SDK at release prep.
+        composable<SettingsRoute> { SettingsScreenRoute(onBack = navController::popBackStack) }
     }
 }

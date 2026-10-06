@@ -1,0 +1,20 @@
+<resources>
+    <string name="scores_title">Scores</string>
+    <string name="back">Back</string>
+    <string name="no_scores">Win a game to see your scores here.</string>
+    <string name="stat_played">Played</string>
+    <string name="stat_won">Won</string>
+    <string name="stat_win_rate">Win rate</string>
+    <string name="stat_streak">Streak</string>
+    <string name="stat_best_streak">Best streak</string>
+    <plurals name="mistakes">
+        <item quantity="one">%1$d mistake</item>
+        <item quantity="other">%1$d mistakes</item>
+    </plurals>
+    <plurals name="hints">
+        <item quantity="one">%1$d hint</item>
+        <item quantity="other">%1$d hints</item>
+    </plurals>
+    <string name="score_details">%1$s · %2$s · %3$s</string>
+    <string name="rank_description">Rank %1$d</string>
+</resources>

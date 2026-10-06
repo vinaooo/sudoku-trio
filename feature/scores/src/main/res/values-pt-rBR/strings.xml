@@ -1,0 +1,20 @@
+<resources>
+    <string name="scores_title">Pontuações</string>
+    <string name="back">Voltar</string>
+    <string name="no_scores">Vença uma partida para ver suas pontuações aqui.</string>
+    <string name="stat_played">Partidas</string>
+    <string name="stat_won">Vitórias</string>
+    <string name="stat_win_rate">Aproveitamento</string>
+    <string name="stat_streak">Sequência</string>
+    <string name="stat_best_streak">Melhor sequência</string>
+    <plurals name="mistakes">
+        <item quantity="one">%1$d erro</item>
+        <item quantity="other">%1$d erros</item>
+    </plurals>
+    <plurals name="hints">
+        <item quantity="one">%1$d dica</item>
+        <item quantity="other">%1$d dicas</item>
+    </plurals>
+    <string name="score_details">%1$s · %2$s · %3$s</string>
+    <string name="rank_description">%1$dº lugar</string>
+</resources>
