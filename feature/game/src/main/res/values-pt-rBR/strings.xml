@@ -42,6 +42,11 @@
     <string name="a11y_erased">%1$s apagada</string>
     <string name="a11y_note_added">Anotação %1$d adicionada em %2$s</string>
     <string name="a11y_note_removed">Anotação %1$d removida de %2$s</string>
+    <string name="a11y_cell_given">%1$d, inicial</string>
+    <string name="a11y_cell_notes">vazia, anotações %1$s</string>
+    <string name="a11y_cell_empty">vazia</string>
+    <string name="a11y_cell_conflict">repetido</string>
+    <string name="a11y_cell_cage">gaiola de %1$d</string>
     <string name="a11y_undone">Jogada desfeita</string>
     <string name="a11y_redone">Jogada refeita</string>
     <!-- Relatar bug -->

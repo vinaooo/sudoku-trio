@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Backspace
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -27,10 +28,10 @@ import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.R
 
 /**
- * The number pad, as chosen with the user: `1 2 3 4 5` / `6 7 8 9 Erase` / a full-width Notes toggle. A digit already
- * on the board nine times ([completed]) dims but stays usable.
+ * The number pad, as chosen with the user: `1 2 3 4 5` / `6 7 8 9 Erase` / a full-width Notes toggle; in landscape
+ * ([grid]) three columns, `1 2 3` / `4 5 6` / `7 8 9` / Notes and Erase. Erase sits on the thumb's side: the right,
+ * or the left when [mirrored] (left hand). A digit already on the board nine times ([completed]) dims but stays usable.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun NumberPad(
     completed: Set<Int>,
@@ -38,29 +39,57 @@ internal fun NumberPad(
     enabled: Boolean,
     onIntent: (GameIntent) -> Unit,
     modifier: Modifier = Modifier,
+    grid: Boolean = false,
+    mirrored: Boolean = false,
 ) {
+    val digit: @Composable RowScope.(Int) -> Unit = { DigitKey(it, it in completed, enabled, onIntent) }
+    val erase: @Composable RowScope.() -> Unit = { EraseKey(enabled, onIntent) }
     Column(modifier.padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(KEY_GAP)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) {
-            for (digit in 1..5) DigitKey(digit, digit in completed, enabled, onIntent)
+        if (grid) {
+            for (row in 0 until GRID_ROWS) {
+                Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) {
+                    for (column in 1..GRID_COLUMNS) digit(row * GRID_COLUMNS + column)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) {
+                if (mirrored) erase()
+                NotesKey(notesMode, enabled, onIntent, Modifier.weight(2f).height(KEY_HEIGHT))
+                if (!mirrored) erase()
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) { for (d in 1..5) digit(d) }
+            Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) {
+                if (mirrored) erase()
+                for (d in 6..9) digit(d)
+                if (!mirrored) erase()
+            }
+            NotesKey(notesMode, enabled, onIntent, Modifier.fillMaxWidth().height(NOTES_HEIGHT))
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(KEY_GAP)) {
-            for (digit in 6..9) DigitKey(digit, digit in completed, enabled, onIntent)
-            FilledTonalButton(
-                onClick = { onIntent(GameIntent.Erase) },
-                enabled = enabled,
-                shapes = androidx.compose.material3.ButtonDefaults.shapes(),
-                modifier = Modifier.weight(1f).height(KEY_HEIGHT),
-            ) { Icon(Icons.AutoMirrored.Rounded.Backspace, stringResource(R.string.erase)) }
-        }
-        ToggleButton(
-            checked = notesMode,
-            onCheckedChange = { onIntent(GameIntent.ToggleNotes) },
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth().height(NOTES_HEIGHT),
-        ) {
-            Icon(Icons.Rounded.Edit, contentDescription = null)
-            Text(stringResource(R.string.notes), modifier = Modifier.padding(start = 8.dp))
-        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun RowScope.EraseKey(enabled: Boolean, onIntent: (GameIntent) -> Unit) {
+    FilledTonalButton(
+        onClick = { onIntent(GameIntent.Erase) },
+        enabled = enabled,
+        shapes = ButtonDefaults.shapes(),
+        modifier = Modifier.weight(1f).height(KEY_HEIGHT),
+    ) { Icon(Icons.AutoMirrored.Rounded.Backspace, stringResource(R.string.erase)) }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun NotesKey(notesMode: Boolean, enabled: Boolean, onIntent: (GameIntent) -> Unit, modifier: Modifier) {
+    ToggleButton(
+        checked = notesMode,
+        onCheckedChange = { onIntent(GameIntent.ToggleNotes) },
+        enabled = enabled,
+        modifier = modifier,
+    ) {
+        Icon(Icons.Rounded.Edit, contentDescription = null)
+        Text(stringResource(R.string.notes), modifier = Modifier.padding(start = 8.dp))
     }
 }
 
@@ -71,7 +100,7 @@ private fun RowScope.DigitKey(digit: Int, completed: Boolean, enabled: Boolean, 
     FilledTonalButton(
         onClick = { onIntent(GameIntent.Digit(digit)) },
         enabled = enabled,
-        shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+        shapes = ButtonDefaults.shapes(),
         modifier = Modifier.weight(1f).height(KEY_HEIGHT).semantics { contentDescription = description },
     ) {
         Text(
@@ -85,6 +114,8 @@ private fun RowScope.DigitKey(digit: Int, completed: Boolean, enabled: Boolean, 
 private val KEY_GAP = 6.dp
 private val KEY_HEIGHT = 56.dp
 private val NOTES_HEIGHT = 48.dp
+private const val GRID_ROWS = 3
+private const val GRID_COLUMNS = 3
 
 /** Material's disabled-content alpha, though the key still works. */
 private const val COMPLETED_ALPHA = 0.38f

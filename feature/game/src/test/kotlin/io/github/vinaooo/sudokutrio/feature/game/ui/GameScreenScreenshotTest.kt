@@ -4,11 +4,15 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
+import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
 import io.github.vinaooo.sudokutrio.domain.model.Cage
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
+import io.github.vinaooo.sudokutrio.domain.model.Handedness
 import io.github.vinaooo.sudokutrio.domain.model.Move
+import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
+import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.rules.ConflictFinder
@@ -55,13 +59,15 @@ class GameScreenScreenshotTest {
         compose.onRoot().captureRoboImage("src/test/screenshots/$name.png")
     }
 
-    private fun ui(session: GameSession, selected: Int?, notesMode: Boolean = false) = GameUiState(
-        session = session,
-        loading = false,
-        selected = selected,
-        notesMode = notesMode,
-        conflicts = ConflictFinder().conflicts(session.state),
-    )
+    private fun ui(session: GameSession, selected: Int?, notesMode: Boolean = false, settings: Settings = Settings()) =
+        GameUiState(
+            settings = settings,
+            session = session,
+            loading = false,
+            selected = selected,
+            notesMode = notesMode,
+            conflicts = ConflictFinder().conflicts(session.state),
+        )
 
     @Test
     fun classic_light_playing() {
@@ -101,5 +107,43 @@ class GameScreenScreenshotTest {
     fun classic_light_short_phone_hint() {
         val hinted = session(Variant.CLASSIC) { it == 76 }.then(Move.RevealHint)
         capture("classic_light_short_phone_hint", ui(hinted, selected = 76))
+    }
+
+    @Test
+    fun classic_light_left_hand_bottom_board() {
+        val left = Settings(handedness = Handedness.LEFT, boardAlignment = BoardAlignment.BOTTOM)
+        capture(
+            "classic_light_left_hand_bottom_board",
+            ui(
+                session(Variant.CLASSIC) {
+                    it % 3 == 0
+                },
+                0,
+                settings = left,
+            ),
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "w891dp-h411dp-land-xxhdpi")
+    fun killer_light_landscape_left_hand_hint() {
+        val hinted = session(Variant.KILLER) { it < 9 || it % 3 == 0 }.then(Move.RevealHint)
+        capture(
+            "killer_light_landscape_left_hand_hint",
+            ui(hinted, selected = null, settings = Settings(handedness = Handedness.LEFT)),
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "sw800dp-w800dp-h1280dp-port-xhdpi")
+    fun tablet_phone_view_left() {
+        val tablet = Settings(phoneView = true, phoneViewSide = PhoneViewSide.LEFT)
+        capture("tablet_phone_view_left", ui(session(Variant.X) { it % 3 == 0 }, 40, settings = tablet))
+    }
+
+    @Test
+    @Config(qualifiers = "pt-rBR-w411dp-h891dp-port-xxhdpi")
+    fun x_light_hint_pt_br() {
+        capture("x_light_hint_pt_br", ui(session(Variant.X) { it % 3 == 0 }.then(Move.RevealHint), selected = null))
     }
 }

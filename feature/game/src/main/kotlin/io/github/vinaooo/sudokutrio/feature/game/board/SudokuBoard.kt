@@ -2,6 +2,10 @@ package io.github.vinaooo.sudokutrio.feature.game.board
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,8 +47,32 @@ fun SudokuBoard(
     val colors = SudokuTrioThemeExtras.boardColors
     val text = rememberTextMeasurer()
     val anchors = remember(puzzle) { puzzle.cages.associateBy { it.cells.min() } }
+    BoxWithConstraints(modifier) {
+        BoardCanvas(board, puzzle, highlights, onSelect, diagonals, colors, text, anchors)
+        CellNodes(
+            board,
+            puzzle,
+            highlights,
+            onSelect,
+            BoardGeometry(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat()),
+        )
+    }
+}
+
+@Composable
+@Suppress("LongParameterList") // The canvas draws everything the board shows.
+private fun BoardCanvas(
+    board: Board,
+    puzzle: Puzzle,
+    highlights: List<CellHighlight>,
+    onSelect: (Int) -> Unit,
+    diagonals: Boolean,
+    colors: BoardColors,
+    text: TextMeasurer,
+    anchors: Map<Int, Cage>,
+) {
     Canvas(
-        modifier.pointerInput(Unit) {
+        Modifier.fillMaxSize().pointerInput(Unit) {
             detectTapGestures { offset ->
                 BoardGeometry(size.width.toFloat(), size.height.toFloat()).cellAt(offset.x, offset.y)?.let(onSelect)
             }
