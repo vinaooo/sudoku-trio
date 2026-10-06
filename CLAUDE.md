@@ -84,6 +84,15 @@ The full gate, matching CI: `./gradlew ktlintCheck detekt lint test verifyRobora
 - **Settings:** `DataStoreSettingsRepository` (Preferences DataStore `settings`); unknown enum values read as defaults.
 - **System:** `RandomSeedSource`, `SystemClock`. `di/DataModule.kt` provides the database, DAOs, DataStore and the saved-game file, and binds the repositories.
 
+### Core modules
+
+- **`:core:designsystem`:** `SudokuTrioTheme` (`MaterialExpressiveTheme`, `MotionScheme.expressive()`), dynamic color on Android 12+ or one of eight committed `ThemeColor` palettes (`PaletteColors.kt`, material-color-utilities TonalSpot; blue is the brand, green is Solo's palette). `BoardColors` maps board roles to scheme roles (cells, highlights, given/entered/conflict/note inks, lines, cages, `selectionBorder`), read via `SudokuTrioThemeExtras.boardColors`; `BoardColorsTest` checks text contrast ≥ 4.5:1 and lines ≥ 3:1 in every palette, light and dark. In light schemes the selected and same-digit fills are close, so the board outlines the selected cell in `selectionBorder`.
+- **`:core:ads`:** `AdBannerProvider` with `PlaceholderAdBanner` (bound in `AdsModule`), sized by `BannerSlot` (full width × 60dp on phones in portrait; ≤ 320dp wide, 50dp tall in landscape; tablets capped at 320dp). AdMob, UMP consent and their interfaces arrive at release prep.
+
+## Device testing
+
+- Never flip the phone's system settings (dark mode via `cmd uimode`, font scale, …) to test: use the app's own settings, Roborazzi or an emulator.
+
 ## Git
 
 Only `master` is long-lived: branch from it and open PRs against it; the user merges with merge commits. One PR per milestone; wait for the merge before stacking the next one. Commit, push and open PRs only when the user asks. CI runs on every PR and on pushes to `master`; Pitest runs nightly.
