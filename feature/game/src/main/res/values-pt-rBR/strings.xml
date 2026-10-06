@@ -1,0 +1,55 @@
+<resources>
+    <string name="time">Tempo</string>
+    <string name="undo">Desfazer</string>
+    <string name="redo">Refazer</string>
+    <string name="hint">Dica</string>
+    <string name="apply_hint">Aplicar a dica</string>
+    <string name="erase">Apagar</string>
+    <string name="notes">Anotações</string>
+    <string name="digit_complete">%1$d, todos colocados</string>
+    <string name="new_game">Novo jogo</string>
+    <string name="restart_board">Recomeçar este tabuleiro</string>
+    <string name="close_menu">Fechar menu</string>
+    <string name="open_scores">Pontuações</string>
+    <string name="open_settings">Configurações</string>
+    <string name="generating">Criando um novo quebra-cabeça</string>
+    <string name="you_won">Você venceu!</string>
+    <string name="win_score">Pontuação: %1$d</string>
+    <string name="win_time">Tempo: %1$s</string>
+    <string name="win_mistakes">Erros: %1$d</string>
+    <string name="win_hints">Dicas: %1$d</string>
+    <!-- Dicas -->
+    <string name="hint_wrong_digit">Este número está errado</string>
+    <string name="hint_reveal">Revelar esta casa</string>
+    <string name="hint_body_fill">Observe as casas destacadas. Toque na dica de novo para preencher.</string>
+    <string name="hint_body_erase">Toque na dica de novo para apagar.</string>
+    <string name="technique_naked_single">Candidato único</string>
+    <string name="technique_hidden_single">Único escondido</string>
+    <string name="technique_cage_combination">Combinação da gaiola</string>
+    <string name="technique_rule_of_45">Regra dos 45</string>
+    <string name="technique_locked_candidates">Candidatos travados</string>
+    <string name="technique_naked_pair">Par nu</string>
+    <string name="technique_hidden_pair">Par escondido</string>
+    <string name="technique_naked_triple">Trio nu</string>
+    <string name="technique_hidden_triple">Trio escondido</string>
+    <string name="technique_x_wing">X-wing</string>
+    <string name="technique_xy_wing">XY-wing</string>
+    <string name="technique_swordfish">Swordfish</string>
+    <!-- TalkBack -->
+    <string name="a11y_board">Tabuleiro de sudoku</string>
+    <string name="a11y_cell">linha %1$d, coluna %2$d</string>
+    <string name="a11y_placed">%1$d em %2$s</string>
+    <string name="a11y_erased">%1$s apagada</string>
+    <string name="a11y_note_added">Anotação %1$d adicionada em %2$s</string>
+    <string name="a11y_note_removed">Anotação %1$d removida de %2$s</string>
+    <string name="a11y_undone">Jogada desfeita</string>
+    <string name="a11y_redone">Jogada refeita</string>
+    <!-- Relatar bug -->
+    <string name="report_bug">Relatar um bug</string>
+    <string name="report_bug_body">Conte o que aconteceu. Enviar por e-mail anexa uma captura do tabuleiro e o jogo, para podermos reproduzi-lo.</string>
+    <string name="report_bug_hint">O que deu errado?</string>
+    <string name="report_by_email">E-mail</string>
+    <string name="report_on_github">GitHub</string>
+    <string name="report_cancel">Cancelar</string>
+    <string name="report_subject">Relatório de bug do Sudoku Trio</string>
+</resources>

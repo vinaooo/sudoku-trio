@@ -110,4 +110,33 @@ class GameUseCasesTest {
     fun `only a won game can be finished`() = runTest {
         shouldThrow<IllegalStateException> { FinishGame(scores, stats, saved) { 0L }(inProgress()) }
     }
+
+    @Test
+    fun `a puzzle can be prepared ahead, with the seed it was made from`() = runTest {
+        val prepare = PreparePuzzle(generator, { 99L }, StandardTestDispatcher(testScheduler))
+        val prepared = prepare(mode(Variant.X))
+        prepared shouldBe PreparedPuzzle(mode(Variant.X), 99L, puzzle())
+        generated shouldBe listOf(mode(Variant.X) to 99L)
+    }
+
+    @Test
+    fun `a new game uses the prepared puzzle of its mode without generating again`() = runTest {
+        saved.saved = inProgress()
+        val start = StartNewGame(abandon, saved, generator, { 1L }, engine, StandardTestDispatcher(testScheduler))
+        val prepared = PreparedPuzzle(mode(Variant.KILLER), 55L, puzzle(empty = listOf(0)))
+        val session = start(mode(Variant.KILLER), prepared)
+        session.seed shouldBe 55L
+        session.state.puzzle shouldBe prepared.puzzle
+        generated shouldBe emptyList()
+        stats.observe(mode(Variant.X)).first().played shouldBe 1
+        saved.saved shouldBe session
+    }
+
+    @Test
+    fun `a prepared puzzle of another mode is ignored`() = runTest {
+        val start = StartNewGame(abandon, saved, generator, { 1L }, engine, StandardTestDispatcher(testScheduler))
+        val session = start(mode(Variant.CLASSIC), PreparedPuzzle(mode(Variant.KILLER), 55L, puzzle(empty = listOf(0))))
+        session.seed shouldBe 1L
+        generated shouldBe listOf(mode(Variant.CLASSIC) to 1L)
+    }
 }

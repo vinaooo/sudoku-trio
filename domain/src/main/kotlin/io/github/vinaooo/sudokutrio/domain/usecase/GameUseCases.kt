@@ -3,6 +3,7 @@ package io.github.vinaooo.sudokutrio.domain.usecase
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.GameStats
+import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.repository.Clock
 import io.github.vinaooo.sudokutrio.domain.repository.SavedGameRepository
@@ -23,9 +24,24 @@ class AbandonGame(private val savedGames: SavedGameRepository, private val stats
     }
 }
 
+/** A puzzle made ahead for [mode], from [seed], so a new game can start at once. */
+data class PreparedPuzzle(val mode: GameMode, val seed: Long, val puzzle: Puzzle)
+
+/** Makes the next puzzle of [GameMode] from a fresh seed, on [dispatcher], while the current game is played. */
+class PreparePuzzle(
+    private val generator: PuzzleGenerator,
+    private val seeds: SeedSource,
+    private val dispatcher: CoroutineDispatcher,
+) {
+    suspend operator fun invoke(mode: GameMode): PreparedPuzzle {
+        val seed = seeds.nextSeed()
+        return PreparedPuzzle(mode, seed, withContext(dispatcher) { generator.generate(mode, seed) })
+    }
+}
+
 /**
- * Starts a new puzzle in [GameMode] from a fresh seed, generated on [dispatcher] (it takes a moment and can be
- * cancelled). An unfinished game it replaces counts as a loss.
+ * Starts a new puzzle in [GameMode]: the [prepared] one when it is of this mode, else one generated now from a fresh
+ * seed on [dispatcher] (it takes a moment and can be cancelled). An unfinished game it replaces counts as a loss.
  */
 class StartNewGame(
     private val abandon: AbandonGame,
@@ -35,9 +51,11 @@ class StartNewGame(
     private val engine: GameEngine,
     private val dispatcher: CoroutineDispatcher,
 ) {
-    suspend operator fun invoke(mode: GameMode): GameSession {
-        val seed = seeds.nextSeed()
-        val puzzle = withContext(dispatcher) { generator.generate(mode, seed) }
+    suspend operator fun invoke(mode: GameMode, prepared: PreparedPuzzle? = null): GameSession {
+        val (seed, puzzle) = prepared?.takeIf { it.mode == mode }?.let { it.seed to it.puzzle } ?: run {
+            val seed = seeds.nextSeed()
+            seed to withContext(dispatcher) { generator.generate(mode, seed) }
+        }
         abandon()
         return GameSession(seed, engine.newGame(puzzle, mode)).also { savedGames.save(it) }
     }
