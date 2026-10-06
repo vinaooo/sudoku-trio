@@ -134,4 +134,18 @@ class GameScreenTest {
         compose.onNodeWithText("Notes").assertExists()
         compose.onNodeWithContentDescription("Hint").assertExists()
     }
+
+    @Test
+    fun `scores and settings stay reachable while a hint shows`() {
+        var opened = 0
+        compose.setContent {
+            SudokuTrioTheme {
+                GameScreen(ready(session.play(Move.RevealHint, engine)!!), {
+                }, onOpenScores = {}, onOpenSettings = { opened++ })
+            }
+        }
+        compose.onNodeWithContentDescription("Scores").assertExists()
+        compose.onNodeWithContentDescription("Settings").performClick()
+        listOf(opened) shouldContainExactly listOf(1)
+    }
 }

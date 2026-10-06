@@ -8,7 +8,10 @@ android {
     namespace = "io.github.vinaooo.sudokutrio.core.ads"
 }
 
-// The placeholder banner only; AdMob and the consent SDK join at release prep.
 dependencies {
     implementation(project(":core:designsystem"))
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
 }
