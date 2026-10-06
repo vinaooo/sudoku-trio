@@ -1,0 +1,57 @@
+package io.github.vinaooo.sudokutrio.core.designsystem
+
+import androidx.test.core.app.ApplicationProvider
+import io.github.vinaooo.sudokutrio.core.designsystem.theme.BlueColors
+import io.github.vinaooo.sudokutrio.core.designsystem.theme.PurpleColors
+import io.github.vinaooo.sudokutrio.core.designsystem.theme.colorSchemeFor
+import io.github.vinaooo.sudokutrio.core.designsystem.theme.isDarkTheme
+import io.github.vinaooo.sudokutrio.core.designsystem.theme.paletteScheme
+import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
+import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+
+@RunWith(RobolectricTestRunner::class)
+class ThemeSelectionTest {
+
+    private val context get() = ApplicationProvider.getApplicationContext<android.content.Context>()
+
+    @Test
+    fun `system mode follows the device, explicit modes override it`() {
+        isDarkTheme(ThemeMode.SYSTEM, systemInDark = true) shouldBe true
+        isDarkTheme(ThemeMode.SYSTEM, systemInDark = false) shouldBe false
+        isDarkTheme(ThemeMode.DARK, systemInDark = false) shouldBe true
+        isDarkTheme(ThemeMode.LIGHT, systemInDark = true) shouldBe false
+    }
+
+    @Test
+    fun `blue, the brand, is used when dynamic color is off`() {
+        colorSchemeFor(context, darkTheme = false, dynamicColor = false) shouldBe BlueColors.light
+        colorSchemeFor(context, darkTheme = true, dynamicColor = false) shouldBe BlueColors.dark
+    }
+
+    @Test
+    fun `with dynamic color off, the chosen color's scheme is used`() {
+        colorSchemeFor(context, darkTheme = false, dynamicColor = false, ThemeColor.PURPLE) shouldBe PurpleColors.light
+        colorSchemeFor(context, darkTheme = true, dynamicColor = false, ThemeColor.PURPLE) shouldBe PurpleColors.dark
+        // Every color has its own scheme.
+        ThemeColor.entries.map { paletteScheme(it, dark = false).primary }.toSet().size shouldBe ThemeColor.entries.size
+    }
+
+    @Test
+    fun `dynamic color is used on Android 12 and later`() {
+        colorSchemeFor(context, darkTheme = false, dynamicColor = true) shouldNotBe BlueColors.light
+        colorSchemeFor(context, darkTheme = true, dynamicColor = true) shouldNotBe BlueColors.dark
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun `older devices fall back to blue even with dynamic color on`() {
+        colorSchemeFor(context, darkTheme = false, dynamicColor = true) shouldBe BlueColors.light
+        colorSchemeFor(context, darkTheme = true, dynamicColor = true) shouldBe BlueColors.dark
+    }
+}
