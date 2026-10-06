@@ -2,17 +2,8 @@ package io.github.vinaooo.sudokutrio.feature.game.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -22,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ImageBitmap
@@ -30,6 +20,7 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -40,6 +31,9 @@ import androidx.compose.ui.unit.roundToIntRect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
+import io.github.vinaooo.sudokutrio.domain.model.Handedness
+import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
@@ -48,7 +42,6 @@ import io.github.vinaooo.sudokutrio.feature.game.GameViewModel
 import io.github.vinaooo.sudokutrio.feature.game.R
 import io.github.vinaooo.sudokutrio.feature.game.board.CellHighlighter
 import io.github.vinaooo.sudokutrio.feature.game.board.SudokuBoard
-import io.github.vinaooo.sudokutrio.feature.game.board.completedDigits
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -115,8 +108,10 @@ fun GameScreen(
 }
 
 /**
- * Portrait: mode and clock, the board (with the hint below it), the number pad and the toolbar, top to bottom.
- * Landscape: the board on the left at full height, the rest in a column on its right (adaptive layouts come later).
+ * Portrait: the top region (mode and clock, or the hint while one shows, so the board never moves), the board at the
+ * top or bottom of its room (Settings), the number pad and the toolbar. Landscape: mode, clock and hint on one side,
+ * the board centered at full height, the pad and a vertical toolbar on the preferred hand's side. A left hand mirrors
+ * the pad and toolbar. On a tablet, phone view keeps the board at a phone's width on the chosen side.
  */
 @Composable
 private fun GameContent(
@@ -125,79 +120,28 @@ private fun GameContent(
     onOpenScores: (() -> Unit)?,
     onOpenSettings: (() -> Unit)?,
 ) {
+    val settings = uiState.settings
+    val layout = BoardLayout(
+        alignment = settings.boardAlignment,
+        phoneView = settings.phoneView && LocalConfiguration.current.smallestScreenWidthDp >= TABLET_WIDTH_DP,
+        side = settings.phoneViewSide,
+    )
+    val mirrored = settings.handedness == Handedness.LEFT
     BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
-        val landscape = maxWidth > maxHeight
-        val controls: @Composable (Modifier) -> Unit = { controlsModifier ->
-            Column(controlsModifier, horizontalAlignment = Alignment.CenterHorizontally) {
-                GameTopBar(
-                    mode = uiState.session?.state?.mode ?: uiState.settings.mode,
-                    elapsedSeconds = uiState.session?.state?.elapsedSeconds ?: 0,
-                    onOpenScores = onOpenScores,
-                    onOpenSettings = onOpenSettings,
-                )
-                if (landscape) Box(Modifier.weight(1f))
-            }
-        }
-        if (landscape) {
-            Row(Modifier.fillMaxSize()) {
-                BoardOrLoading(uiState, onIntent, Modifier.fillMaxHeight().aspectRatio(1f).padding(8.dp))
-                Column(Modifier.width(LANDSCAPE_PANEL).fillMaxHeight()) {
-                    controls(Modifier.weight(1f))
-                    PadAndToolbar(uiState, onIntent)
-                }
-            }
+        if (maxWidth > maxHeight) {
+            LandscapeGame(uiState, onIntent, layout, mirrored, onOpenScores, onOpenSettings)
         } else {
-            Column(Modifier.fillMaxSize()) {
-                controls(Modifier)
-                BoardOrLoading(
-                    uiState,
-                    onIntent,
-                    Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp, vertical = 4.dp),
-                )
-                PadAndToolbar(uiState, onIntent)
-            }
+            PortraitGame(uiState, onIntent, layout, mirrored, onOpenScores, onOpenSettings)
         }
     }
 }
 
-@Composable
-private fun PadAndToolbar(uiState: GameUiState, onIntent: (GameIntent) -> Unit) {
-    val session = uiState.session
-    val ready = session != null && !uiState.loading && !session.state.isWon
-    val values = session?.state?.board?.values
-    val completed = remember(values) { values?.let(::completedDigits).orEmpty() }
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        NumberPad(completed, uiState.notesMode, enabled = ready, onIntent = onIntent)
-        GameToolbar(
-            canUndo = session?.canUndo == true,
-            canRedo = session?.canRedo == true,
-            hintShown = session?.state?.pendingHint != null,
-            enabled = ready,
-            onIntent = onIntent,
-            modifier = Modifier.padding(vertical = 12.dp),
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun BoardOrLoading(uiState: GameUiState, onIntent: (GameIntent) -> Unit, modifier: Modifier) {
-    val session = uiState.session
-    Box(modifier, contentAlignment = Alignment.TopCenter) {
-        if (session == null || uiState.loading) {
-            val loading = stringResource(R.string.generating)
-            LoadingIndicator(Modifier.align(Alignment.Center).semantics { contentDescription = loading })
-        } else {
-            Board(session, uiState.selected, uiState.conflicts, onIntent)
-            // In the room below the board, so the board never moves when a hint comes or goes.
-            HintBanner(session.state.pendingHint, Modifier.align(Alignment.BottomCenter))
-        }
-    }
-}
+/** Where the board sits in its room: Settings' board position, and phone view's width and side. */
+internal data class BoardLayout(val alignment: BoardAlignment, val phoneView: Boolean, val side: PhoneViewSide)
 
 /** The board with its highlights, worked out only when the board, selection, hint or conflicts change. */
 @Composable
-private fun Board(session: GameSession, selected: Int?, conflicts: Set<Int>, onIntent: (GameIntent) -> Unit) {
+internal fun Board(session: GameSession, selected: Int?, conflicts: Set<Int>, onIntent: (GameIntent) -> Unit) {
     val state = session.state
     val highlighter = remember(state.puzzle, state.mode) { CellHighlighter(state.puzzle, state.mode.variant) }
     val hintCells = state.pendingHint?.cells.orEmpty()
@@ -216,7 +160,17 @@ private fun Board(session: GameSession, selected: Int?, conflicts: Set<Int>, onI
 }
 
 internal const val BOARD_TAG = "board"
-private val LANDSCAPE_PANEL = 360.dp
+
+/** Holds the mode and clock or, in their place, the hint card: the board below never moves. */
+internal val TOP_REGION = 88.dp
+internal val SIDE_WIDTH = 200.dp
+internal val PAD_WIDTH = 184.dp
+
+/** Phone view's board width: a typical modern phone's (412dp), as in Solo. */
+internal val PHONE_WIDTH = 412.dp
+
+/** From this short side (Material's medium window), the screen is a tablet's and phone view applies. */
+private const val TABLET_WIDTH_DP = 600
 private const val MENU_CLOSED_MILLIS = 400L
 
 /** A bug report being written, with the board's [screenshot]. */

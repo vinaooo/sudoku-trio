@@ -145,8 +145,17 @@ private fun ScoreRow(rank: Int, record: ScoreRecord) {
     val date = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(record.playedAtMillis))
     val rankDescription = stringResource(R.string.rank_description, rank)
     val spokenTime = spokenElapsed(record.elapsedSeconds)
-    val mistakes = pluralStringResource(R.plurals.mistakes, record.mistakes, record.mistakes)
-    val hints = pluralStringResource(R.plurals.hints, record.hintsUsed, record.hintsUsed)
+    // Zero has its own words: Portuguese plural rules would say "0 erro".
+    val mistakes = if (record.mistakes == 0) {
+        stringResource(R.string.no_mistakes)
+    } else {
+        pluralStringResource(R.plurals.mistakes, record.mistakes, record.mistakes)
+    }
+    val hints = if (record.hintsUsed == 0) {
+        stringResource(R.string.no_hints)
+    } else {
+        pluralStringResource(R.plurals.hints, record.hintsUsed, record.hintsUsed)
+    }
     ListItem(
         modifier = Modifier.semantics(mergeDescendants = true) {},
         leadingContent = {

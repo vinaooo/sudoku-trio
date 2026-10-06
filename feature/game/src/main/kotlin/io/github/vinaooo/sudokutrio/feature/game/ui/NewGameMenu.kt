@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -56,7 +57,8 @@ import kotlinx.coroutines.launch
 
 /**
  * New game or restart, as an Expressive FAB menu: the options shoot up out of the button one after another, each
- * overshooting with a bounce (to the left of the vertical toolbar), and the button turns into a close button meanwhile.
+ * overshooting with a bounce (beside the vertical toolbar), and the button turns into a close button meanwhile. In a
+ * right-to-left layout (the left-handed one) everything mirrors: the pills grow toward the screen's middle either way.
  * The pills follow the FAB menu spec, drawn here because its own column clips them and only widens them in place.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -148,8 +150,8 @@ private fun ReportBugButton(vertical: Boolean, visible: () -> Float, onClick: ()
 }
 
 /**
- * The bottom-left corner of the game's [area] (the screen above the ad), a margin in; when [vertical] (landscape),
- * above the Scores and Settings buttons that sit in that corner.
+ * The bottom-start corner of the game's [area] (the screen above the ad), a margin in, mirrored right to left; when
+ * [vertical] (landscape), above the Scores and Settings buttons that sit in that corner.
  */
 private class GameAreaBottomStart(private val area: IntRect, private val vertical: Boolean, density: Density) :
     PopupPositionProvider {
@@ -161,7 +163,14 @@ private class GameAreaBottomStart(private val area: IntRect, private val vertica
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize,
-    ) = IntOffset(area.left + margin, area.bottom - margin - lift - popupContentSize.height)
+    ): IntOffset {
+        val x = if (layoutDirection == LayoutDirection.Ltr) {
+            area.left + margin
+        } else {
+            area.right - margin - popupContentSize.width
+        }
+        return IntOffset(x, area.bottom - margin - lift - popupContentSize.height)
+    }
 }
 
 private val CORNER_MARGIN = 16.dp
@@ -185,6 +194,7 @@ private fun MenuPill(
     vertical: Boolean,
     onClick: () -> Unit,
 ) {
+    val ltr = LocalLayoutDirection.current == LayoutDirection.Ltr
     Surface(
         onClick = onClick,
         shape = CircleShape,
@@ -192,11 +202,11 @@ private fun MenuPill(
         modifier = Modifier.height(56.dp).graphicsLayer {
             val away = 1f - progress()
             translationY = away * (fromButton + if (vertical) 0 else 1) * size.height * 1.1f
-            translationX = if (vertical) away * size.height * 1.3f else 0f
+            translationX = if (vertical) away * size.height * 1.3f * (if (ltr) 1 else -1) else 0f
             scaleX = 0.5f + 0.5f * progress()
             scaleY = scaleX
             alpha = progress().coerceIn(0f, 1f)
-            transformOrigin = TransformOrigin(1f, 1f)
+            transformOrigin = TransformOrigin(if (ltr) 1f else 0f, 1f)
         },
     ) {
         Row(
@@ -211,9 +221,9 @@ private fun MenuPill(
 }
 
 /**
- * Places the menu above the button, its right edge on the toolbar's, or to its left when [beside], its bottom on the
- * toolbar's. [gap] clears the toolbar, [toolbarInset] is the toolbar's padding around the button, and [room] the
- * empty space around the pills, which this lines up as if it weren't there.
+ * Places the menu above the button, its end edge on the toolbar's, or before it when [beside], its bottom on the
+ * toolbar's; mirrored right to left. [gap] clears the toolbar, [toolbarInset] is the toolbar's padding around the
+ * button, and [room] the empty space around the pills, which this lines up as if it weren't there.
  */
 private data class MenuBesideAnchor(private val beside: Boolean, private val density: Density) : PopupPositionProvider {
     private val gap = with(density) { 16.dp.roundToPx() }
@@ -225,16 +235,23 @@ private data class MenuBesideAnchor(private val beside: Boolean, private val den
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize,
-    ): IntOffset = if (beside) {
-        IntOffset(
-            anchorBounds.left - gap - popupContentSize.width + room,
-            anchorBounds.bottom + toolbarInset - popupContentSize.height + room,
-        )
-    } else {
-        IntOffset(
-            anchorBounds.right + toolbarInset - popupContentSize.width + room,
-            anchorBounds.top - gap - popupContentSize.height + room,
-        )
+    ): IntOffset {
+        val ltr = layoutDirection == LayoutDirection.Ltr
+        return if (beside) {
+            IntOffset(
+                if (ltr) anchorBounds.left - gap - popupContentSize.width + room else anchorBounds.right + gap - room,
+                anchorBounds.bottom + toolbarInset - popupContentSize.height + room,
+            )
+        } else {
+            IntOffset(
+                if (ltr) {
+                    anchorBounds.right + toolbarInset - popupContentSize.width + room
+                } else {
+                    anchorBounds.left - toolbarInset - room
+                },
+                anchorBounds.top - gap - popupContentSize.height + room,
+            )
+        }
     }
 }
 

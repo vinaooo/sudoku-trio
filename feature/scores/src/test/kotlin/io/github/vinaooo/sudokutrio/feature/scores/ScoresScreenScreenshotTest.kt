@@ -69,4 +69,8 @@ class ScoresScreenScreenshotTest {
         const val NOON = 1_767_268_800_000L
         const val DAY = 86_400_000L
     }
+
+    @Test
+    @Config(qualifiers = "pt-rBR-w411dp-h891dp-port-xxhdpi")
+    fun scores_light_pt_br() = capture("scores_light_pt_br", ThemeMode.LIGHT)
 }

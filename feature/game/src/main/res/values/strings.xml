@@ -42,6 +42,11 @@
     <string name="a11y_erased">%1$s cleared</string>
     <string name="a11y_note_added">Note %1$d added in %2$s</string>
     <string name="a11y_note_removed">Note %1$d removed from %2$s</string>
+    <string name="a11y_cell_given">%1$d, given</string>
+    <string name="a11y_cell_notes">empty, notes %1$s</string>
+    <string name="a11y_cell_empty">empty</string>
+    <string name="a11y_cell_conflict">repeated</string>
+    <string name="a11y_cell_cage">cage of %1$d</string>
     <string name="a11y_undone">Move undone</string>
     <string name="a11y_redone">Move redone</string>
     <!-- Bug report -->
