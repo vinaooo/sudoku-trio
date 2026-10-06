@@ -19,15 +19,15 @@ interface ScoreRepository {
     /** The best [limit] scores of [mode], in its ranking order ([ScoreRecord.rankingFor]). */
     fun observeTopScores(mode: GameMode, limit: Int = ScoreRecord.TOP_LIMIT): Flow<List<ScoreRecord>>
 
-    /** The modes that have at least one score. */
-    fun observeRankedModes(): Flow<Set<GameMode>>
-
     suspend fun add(record: ScoreRecord)
 }
 
 /** Statistics are kept per mode. */
 interface StatsRepository {
     fun observe(mode: GameMode): Flow<GameStats>
+
+    /** The modes played at least once, won or not: the Scores screen's tabs. */
+    fun observePlayedModes(): Flow<Set<GameMode>>
 
     suspend fun update(mode: GameMode, transform: (GameStats) -> GameStats)
 }

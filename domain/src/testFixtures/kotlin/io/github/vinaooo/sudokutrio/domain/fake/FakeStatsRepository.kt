@@ -12,6 +12,9 @@ class FakeStatsRepository(initial: Map<GameMode, GameStats> = emptyMap()) : Stat
 
     override fun observe(mode: GameMode): Flow<GameStats> = stats.map { it[mode] ?: GameStats() }
 
+    override fun observePlayedModes(): Flow<Set<GameMode>> =
+        stats.map { all -> all.filterValues { it.played > 0 }.keys }
+
     override suspend fun update(mode: GameMode, transform: (GameStats) -> GameStats) {
         stats.value += mode to transform(stats.value[mode] ?: GameStats())
     }
