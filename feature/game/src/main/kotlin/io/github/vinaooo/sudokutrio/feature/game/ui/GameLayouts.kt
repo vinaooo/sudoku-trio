@@ -45,20 +45,24 @@ internal fun PortraitGame(
 ) {
     val hint = uiState.session?.state?.pendingHint
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxWidth().height(TOP_REGION), contentAlignment = Alignment.CenterStart) {
-            AnimatedContent(targetState = hint, contentKey = { it != null }, label = "top region") { shown ->
+        // The hint takes the mode and clock's place; Scores and Settings stay reachable beside it.
+        Row(
+            Modifier.fillMaxWidth().height(TOP_REGION).padding(end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AnimatedContent(
+                targetState = hint,
+                contentKey = { it != null },
+                label = "top region",
+                modifier = Modifier.weight(1f),
+            ) { shown ->
                 if (shown != null) {
-                    HintCard(shown, Modifier.fillMaxWidth().padding(horizontal = 12.dp))
+                    HintCard(shown, Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp))
                 } else {
-                    Row(
-                        Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        ModeAndTime(uiState.mode(), uiState.elapsedSeconds(), Modifier.weight(1f))
-                        NavigationButtons(onOpenScores, onOpenSettings)
-                    }
+                    ModeAndTime(uiState.mode(), uiState.elapsedSeconds(), Modifier.padding(start = 16.dp))
                 }
             }
+            NavigationButtons(onOpenScores, onOpenSettings)
         }
         BoardArea(
             uiState,

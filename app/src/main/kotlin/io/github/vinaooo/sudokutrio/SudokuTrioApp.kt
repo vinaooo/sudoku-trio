@@ -26,7 +26,12 @@ import io.github.vinaooo.sudokutrio.navigation.SettingsRoute
 
 /** The navigation host. Only the game screen carries the ad banner, at its bottom; Scores and Settings have none. */
 @Composable
-fun SudokuTrioApp(adBanner: AdBannerProvider, modifier: Modifier = Modifier) {
+fun SudokuTrioApp(
+    adBanner: AdBannerProvider,
+    modifier: Modifier = Modifier,
+    privacyOptionsRequired: Boolean = false,
+    onOpenPrivacyOptions: () -> Unit = {},
+) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -47,7 +52,12 @@ fun SudokuTrioApp(adBanner: AdBannerProvider, modifier: Modifier = Modifier) {
             }
         }
         composable<ScoresRoute> { ScoresScreenRoute(onBack = navController::popBackStack) }
-        // Privacy options arrive with the consent SDK at release prep.
-        composable<SettingsRoute> { SettingsScreenRoute(onBack = navController::popBackStack) }
+        composable<SettingsRoute> {
+            SettingsScreenRoute(
+                onBack = navController::popBackStack,
+                privacyOptionsRequired = privacyOptionsRequired,
+                onOpenPrivacyOptions = onOpenPrivacyOptions,
+            )
+        }
     }
 }
