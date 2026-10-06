@@ -123,7 +123,7 @@ The full gate, matching CI: `./gradlew ktlintCheck detekt lint test verifyRobora
 
 ### Launcher icon
 
-- Adaptive icon (`mipmap-anydpi/ic_launcher.xml`): brand-blue background (`#39608F`, `BlueColors.light.primary`), a foreground 3×3 grid of light cells with six givens (1 · 9 / · 6 2 / 3 0 ·, the user's digits, 0 included on purpose), and a separate monochrome layer: the cells with the digits cut out (`fillType="evenOdd"`). Digits are Roboto Bold glyph outlines (Apache 2.0) turned into paths with fontTools; the grid sits inside the 66dp safe circle. No wallpaper-colored icon (ask the user first). `LauncherIconScreenshotTest` keeps a golden of both layers.
+- Adaptive icon (`mipmap-anydpi/ic_launcher.xml`): brand-blue background (`#39608F`, `BlueColors.light.primary`), a foreground 3×3 grid of light cells with seven givens (1 · 9 / · 6 2 / 3 0 4, the user's digits, 0 included on purpose), and a separate monochrome layer: the cells with the digits cut out (`fillType="evenOdd"`). Digits are Roboto Bold glyph outlines (Apache 2.0) turned into paths with fontTools; the grid sits inside the 66dp safe circle. No wallpaper-colored icon (ask the user first). `LauncherIconScreenshotTest` keeps a golden of both layers.
 
 ## Device testing
 
