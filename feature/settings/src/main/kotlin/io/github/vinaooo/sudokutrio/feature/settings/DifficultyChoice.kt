@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Psychology
-import androidx.compose.material.icons.rounded.Spa
-import androidx.compose.material.icons.rounded.Whatshot
+import androidx.compose.material.icons.rounded.SentimentNeutral
+import androidx.compose.material.icons.rounded.SentimentSatisfied
+import androidx.compose.material.icons.rounded.SentimentVerySatisfied
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -130,9 +130,9 @@ private const val SQUASH = 0.85f
 private const val BOUNCE_DAMPING = 0.4f
 
 private val icons = mapOf(
-    Difficulty.EASY to Icons.Rounded.Spa,
-    Difficulty.MEDIUM to Icons.Rounded.Extension,
-    Difficulty.HARD to Icons.Rounded.Whatshot,
+    Difficulty.EASY to Icons.Rounded.SentimentVerySatisfied,
+    Difficulty.MEDIUM to Icons.Rounded.SentimentSatisfied,
+    Difficulty.HARD to Icons.Rounded.SentimentNeutral,
     Difficulty.EXPERT to Icons.Rounded.Psychology,
 )
 
