@@ -96,9 +96,9 @@ class ObserveTopScores(private val scores: ScoreRepository) {
     operator fun invoke(mode: GameMode): Flow<List<ScoreRecord>> = scores.observeTopScores(mode)
 }
 
-/** The modes already won at least once, for the Scores screen's tabs. */
-class ObserveRankedModes(private val scores: ScoreRepository) {
-    operator fun invoke(): Flow<Set<GameMode>> = scores.observeRankedModes()
+/** The modes played at least once, for the Scores screen's tabs: a mode never won still shows its stats. */
+class ObservePlayedModes(private val stats: StatsRepository) {
+    operator fun invoke(): Flow<Set<GameMode>> = stats.observePlayedModes()
 }
 
 class ObserveStats(private val stats: StatsRepository) {

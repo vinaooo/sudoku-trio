@@ -14,8 +14,6 @@ class FakeScoreRepository(initial: List<ScoreRecord> = emptyList()) : ScoreRepos
         all.filter { it.mode == mode }.sortedWith(ScoreRecord.rankingFor(mode)).take(limit)
     }
 
-    override fun observeRankedModes(): Flow<Set<GameMode>> = records.map { all -> all.map { it.mode }.toSet() }
-
     override suspend fun add(record: ScoreRecord) {
         records.value += record
     }

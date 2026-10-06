@@ -57,6 +57,7 @@ class GameUseCasesTest {
         StartNewGame(abandon, saved, generator, { 1L }, engine, StandardTestDispatcher(testScheduler))(mode())
         stats.observe(mode(Variant.X)).first() shouldBe GameStats(played = 1)
         stats.observe(mode()).first() shouldBe GameStats()
+        ObservePlayedModes(stats)().first() shouldBe setOf(mode(Variant.X))
     }
 
     @Test
@@ -101,7 +102,7 @@ class GameUseCasesTest {
         stats.observe(mode()).first() shouldBe GameStats(played = 1, won = 1, currentStreak = 1, bestStreak = 1)
         saved.saved.shouldBeNull()
         ObserveTopScores(scores)(mode()).first() shouldBe listOf(record)
-        ObserveRankedModes(scores)().first() shouldBe setOf(mode())
+        ObservePlayedModes(stats)().first() shouldBe setOf(mode())
         ObserveStats(stats)(mode()).first().won shouldBe 1
     }
 
