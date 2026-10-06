@@ -71,7 +71,7 @@ internal fun PortraitGame(
             Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp, vertical = 4.dp),
         )
         val controls = remember(uiState) { uiState.controls() }
-        NumberPad(controls.completed, uiState.notesMode, controls.toolbar.enabled, onIntent, mirrored = mirrored)
+        NumberPad(controls.completed, controls.toolbar.enabled, onIntent, mirrored = mirrored)
         GameToolbar(
             controls.toolbar,
             onIntent,
@@ -116,7 +116,6 @@ internal fun LandscapeGame(
             if (mirrored) toolbar()
             NumberPad(
                 state.completed,
-                uiState.notesMode,
                 state.toolbar.enabled,
                 onIntent,
                 Modifier.width(PAD_WIDTH),
@@ -151,6 +150,7 @@ private fun GameUiState.controls(): Controls {
     return Controls(
         completed = session?.state?.board?.values?.let(::completedDigits).orEmpty(),
         toolbar = ToolbarState(
+            notesMode = notesMode,
             canUndo = session?.canUndo == true,
             canRedo = session?.canRedo == true,
             hintShown = session?.state?.pendingHint != null,

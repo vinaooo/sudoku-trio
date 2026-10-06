@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Redo
 import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Settings
@@ -27,6 +29,8 @@ import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -151,6 +155,7 @@ internal fun GameToolbar(
 
 /** What the toolbar's buttons need to know. */
 internal data class ToolbarState(
+    val notesMode: Boolean,
     val canUndo: Boolean,
     val canRedo: Boolean,
     val hintShown: Boolean,
@@ -189,6 +194,7 @@ private fun ToolbarActions(
             LtrIcon { Icon(Icons.AutoMirrored.Rounded.Redo, stringResource(R.string.redo)) }
         }
     }
+    AnimatedVisibility(!menuOpen, enter = enter, exit = exit) { NotesToggle(state, onIntent) }
     AnimatedVisibility(!menuOpen, enter = enter, exit = exit) {
         IconButton(onClick = { onIntent(GameIntent.Hint) }, enabled = state.enabled) {
             Crossfade(state.hintShown, animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(), label = "hint") {
@@ -201,6 +207,22 @@ private fun ToolbarActions(
         }
     }
     NewGameMenu(menuOpen, onMenuOpenChange, onIntent, vertical)
+}
+
+/** Notes mode: a pencil that fills in while digits go in as pencil marks. TalkBack reads it as an on/off switch. */
+@Composable
+private fun NotesToggle(state: ToolbarState, onIntent: (GameIntent) -> Unit) {
+    IconToggleButton(
+        checked = state.notesMode,
+        onCheckedChange = { onIntent(GameIntent.ToggleNotes) },
+        enabled = state.enabled,
+        colors = IconButtonDefaults.iconToggleButtonColors(
+            checkedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+    ) {
+        Icon(if (state.notesMode) Icons.Rounded.Edit else Icons.Outlined.Edit, stringResource(R.string.notes))
+    }
 }
 
 /** Draws [icon] left to right whatever the toolbar's direction, so undo and redo keep pointing their own way. */

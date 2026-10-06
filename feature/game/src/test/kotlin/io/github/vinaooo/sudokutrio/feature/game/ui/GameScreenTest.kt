@@ -2,6 +2,7 @@ package io.github.vinaooo.sudokutrio.feature.game.ui
 
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -64,7 +65,7 @@ class GameScreenTest {
         show(ready())
         compose.onNodeWithText("7").performClick()
         compose.onNodeWithContentDescription("Erase").performClick()
-        compose.onNodeWithText("Notes").performClick()
+        compose.onNodeWithContentDescription("Notes").performClick()
         intents shouldContainExactly listOf(GameIntent.Digit(7), GameIntent.Erase, GameIntent.ToggleNotes)
     }
 
@@ -131,7 +132,7 @@ class GameScreenTest {
     fun `landscape shows the board and every control`() {
         show(ready())
         compose.onNodeWithTag(BOARD_TAG).assertExists()
-        compose.onNodeWithText("Notes").assertExists()
+        compose.onNodeWithContentDescription("Notes").assertExists()
         compose.onNodeWithContentDescription("Hint").assertExists()
     }
 
@@ -147,5 +148,12 @@ class GameScreenTest {
         compose.onNodeWithContentDescription("Scores").assertExists()
         compose.onNodeWithContentDescription("Settings").performClick()
         listOf(opened) shouldContainExactly listOf(1)
+    }
+
+    @Test
+    fun `the notes toggle in the toolbar shows when notes mode is on`() {
+        show(ready().copy(notesMode = true))
+        compose.onNodeWithContentDescription("Notes").assertIsOn().performClick()
+        intents shouldContainExactly listOf(GameIntent.ToggleNotes)
     }
 }
