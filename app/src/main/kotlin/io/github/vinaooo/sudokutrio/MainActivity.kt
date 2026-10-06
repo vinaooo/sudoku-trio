@@ -7,17 +7,11 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.vinaooo.sudokutrio.core.ads.AdBannerProvider
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.isDarkTheme
 import io.github.vinaooo.sudokutrio.domain.model.Settings
@@ -28,6 +22,8 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject lateinit var settingsRepository: SettingsRepository
+
+    @Inject lateinit var adBanner: AdBannerProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -41,10 +37,7 @@ class MainActivity : ComponentActivity() {
                 enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
             }
             SudokuTrioTheme(settings.themeMode, settings.dynamicColor, settings.themeColor) {
-                // Placeholder until the game screen lands (milestone 6).
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Box(contentAlignment = Alignment.Center) { Text(stringResource(R.string.app_name)) }
-                }
+                SudokuTrioApp(adBanner)
             }
         }
     }
