@@ -24,10 +24,12 @@ class GameInvariantsPropertyTest {
     private fun randomMove(random: Random): Move {
         val cell = random.nextInt(-1, Grid.SIZE + 1)
         val digit = random.nextInt(0, Grid.SIDE + 2)
-        return when (random.nextInt(3)) {
+        return when (random.nextInt(MOVE_KINDS)) {
             0 -> Move.Place(cell, digit)
             1 -> Move.ToggleNote(cell, digit)
-            else -> Move.Erase(cell)
+            2 -> Move.Erase(cell)
+            3 -> Move.RevealHint
+            else -> Move.ApplyHint
         }
     }
 
@@ -44,8 +46,10 @@ class GameInvariantsPropertyTest {
                 val played = session.play(move, engine)
                 (played != null) shouldBe legal
                 if (played != null) {
-                    played.state.moves shouldBe before.state.moves + 1
-                    played.undo().shouldNotBeNull().state.board shouldBe before.state.board
+                    played.state.moves shouldBe before.state.moves + if (move == Move.RevealHint) 0 else 1
+                    if (played.state.board != before.state.board) {
+                        played.undo().shouldNotBeNull().state.board shouldBe before.state.board
+                    }
                     session = played
                 }
                 val state = session.state
@@ -76,6 +80,7 @@ class GameInvariantsPropertyTest {
     }
 
     private companion object {
+        const val MOVE_KINDS = 5
         const val ITERATIONS = 100
         const val STEPS = 30
     }

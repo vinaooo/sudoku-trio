@@ -20,9 +20,9 @@ class GameSerializationTest {
     @EnumSource(Variant::class)
     fun `a session with notes, mistakes and undo history survives a JSON round trip`(variant: Variant) {
         val session = GameSession(7, newState(variant))
-            .play(Move.ToggleNote(2, 5), engine).shouldNotBeNull()
+            .play(Move.ToggleNote(3, 5), engine).shouldNotBeNull()
             .play(Move.Place(0, wrongDigit(0)), engine).shouldNotBeNull()
-            .play(Move.Place(4, SOLUTION[4]), engine).shouldNotBeNull()
+            .play(Move.Place(6, SOLUTION[6]), engine).shouldNotBeNull()
             .undo().shouldNotBeNull()
             .tick(9, engine)
         val json = Json.encodeToString(GameSession.serializer(), session)

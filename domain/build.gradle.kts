@@ -35,3 +35,10 @@ pitest {
     mutationThreshold.set(80)
     coverageThreshold.set(90)
 }
+
+// Measures puzzle generation per mode (time, givens, difficulty hit rate, uniqueness), outside the test task.
+tasks.register<JavaExec>("benchmarkGenerator") {
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("io.github.vinaooo.sudokutrio.domain.generator.GeneratorBenchmarkKt")
+    args((project.findProperty("seeds") as String?) ?: "30")
+}

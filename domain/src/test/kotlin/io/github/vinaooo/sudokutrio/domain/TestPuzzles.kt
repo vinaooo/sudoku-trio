@@ -26,14 +26,15 @@ val SOLUTION: List<Int> = (
 val CAGES: List<Cage> = Grid.CELLS.chunked(Grid.BOX).map { cells -> Cage(cells.sumOf { SOLUTION[it] }, cells) }
 
 /** The solution with [empty] cells blanked out. */
-fun puzzle(empty: Collection<Int> = Grid.CELLS.filter { it % 2 == 0 }, cages: List<Cage> = emptyList()) =
+/** By default every third cell is empty: 27 cells, one solution. */
+fun puzzle(empty: Collection<Int> = Grid.CELLS.filter { it % 3 == 0 }, cages: List<Cage> = emptyList()) =
     Puzzle(givens = SOLUTION.mapIndexed { cell, digit -> if (cell in empty) 0 else digit }, solution = SOLUTION, cages)
 
 fun mode(variant: Variant = Variant.CLASSIC, difficulty: Difficulty = Difficulty.EASY) = GameMode(variant, difficulty)
 
 fun newState(
     variant: Variant = Variant.CLASSIC,
-    empty: Collection<Int> = Grid.CELLS.filter { it % 2 == 0 },
+    empty: Collection<Int> = Grid.CELLS.filter { it % 3 == 0 },
     engine: GameEngine = GameEngine(),
 ): GameState = engine.newGame(puzzle(empty, if (variant == Variant.KILLER) CAGES else emptyList()), mode(variant))
 

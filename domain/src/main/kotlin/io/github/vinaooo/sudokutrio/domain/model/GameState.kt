@@ -14,6 +14,8 @@ data class GameState(
     val hintsUsed: Int = 0,
     val moves: Int = 0,
     val elapsedSeconds: Long = 0,
+    /** The hint on show, until it is carried out or another move or undo makes it stale. */
+    val pendingHint: Hint? = null,
 ) {
     val isWon: Boolean
         get() = board.values == puzzle.solution

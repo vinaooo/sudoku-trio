@@ -88,15 +88,15 @@ class GameEngineTest {
 
     @Test
     fun `placing a digit clears the cell's notes and that digit from the notes of every cell it sees`() {
-        // Cells 0, 2 (row), 18 (column + box), 20 (box) and 4 (row) are empty; 30 is not a peer of 0.
+        // Cells 0, 3 (row), 9 (column + box), 18 (column + box) and 6 (row) are empty; 30 is not a peer of 0.
         val digit = SOLUTION[0]
         val other = wrongDigit(0)
-        val noted = listOf(0, 2, 18, 20, 4, 30).fold(state) { s, cell ->
+        val noted = listOf(0, 3, 9, 18, 6, 30).fold(state) { s, cell ->
             s.play(Move.ToggleNote(cell, digit)).play(Move.ToggleNote(cell, other))
         }
         val placed = noted.play(Move.Place(0, digit))
         placed.board.notes[0] shouldBe emptySet()
-        listOf(2, 18, 20, 4).forEach { placed.board.notes[it] shouldBe setOf(other) }
+        listOf(3, 9, 18, 6).forEach { placed.board.notes[it] shouldBe setOf(other) }
         placed.board.notes[30] shouldBe setOf(digit, other)
     }
 
@@ -104,10 +104,10 @@ class GameEngineTest {
     fun `in sudoku X a digit also clears the notes along its diagonal`() {
         val x = newState(Variant.X)
         val digit = SOLUTION[0]
-        val placed = x.play(Move.ToggleNote(80, digit)).play(Move.Place(0, digit))
-        placed.board.notes[80] shouldBe emptySet()
-        val classic = state.play(Move.ToggleNote(80, digit)).play(Move.Place(0, digit))
-        classic.board.notes[80] shouldBe setOf(digit)
+        val placed = x.play(Move.ToggleNote(30, digit)).play(Move.Place(0, digit))
+        placed.board.notes[30] shouldBe emptySet()
+        val classic = state.play(Move.ToggleNote(30, digit)).play(Move.Place(0, digit))
+        classic.board.notes[30] shouldBe setOf(digit)
     }
 
     @Test
@@ -137,12 +137,11 @@ class GameEngineTest {
     @Test
     fun `legal moves are exactly the moves isLegal accepts`() {
         val legal = engine.legalMoves(state).toSet()
-        // 41 empty cells: 9 digits and 9 notes each, nothing to erase yet.
-        legal.size shouldBe 41 * 18
+        // 27 empty cells: 9 digits and 9 notes each, nothing to erase yet, and a hint to reveal.
+        legal.size shouldBe 27 * 18 + 1
         legal.all { engine.isLegal(state, it) } shouldBe true
-        Grid.CELLS.filter { state.puzzle.isGiven(it) }.forEach { cell ->
-            legal.none { it.cell == cell } shouldBe true
-        }
+        val givens = Grid.CELLS.filter { state.puzzle.isGiven(it) }.toSet()
+        legal.none { it is Move.Place && it.cell in givens || it is Move.ToggleNote && it.cell in givens } shouldBe true
     }
 
     @Test

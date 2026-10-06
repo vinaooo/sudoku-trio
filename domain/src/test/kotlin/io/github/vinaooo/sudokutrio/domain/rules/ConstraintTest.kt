@@ -23,16 +23,16 @@ class ConstraintTest {
 
     @Test
     fun `rows, columns and boxes hold the expected cells`() {
-        RowConstraint.units(classic)[1] shouldBe (9..17).toList()
-        ColumnConstraint.units(classic)[2] shouldBe listOf(2, 11, 20, 29, 38, 47, 56, 65, 74)
-        BoxConstraint.units(classic)[4] shouldContainExactlyInAnyOrder listOf(30, 31, 32, 39, 40, 41, 48, 49, 50)
+        RowConstraint.units(emptyList())[1] shouldBe (9..17).toList()
+        ColumnConstraint.units(emptyList())[2] shouldBe listOf(2, 11, 20, 29, 38, 47, 56, 65, 74)
+        BoxConstraint.units(emptyList())[4] shouldContainExactlyInAnyOrder listOf(30, 31, 32, 39, 40, 41, 48, 49, 50)
     }
 
     @Test
     fun `sudoku X adds both diagonals`() {
         val units = constraintsFor(Variant.X).units(classic)
         units.size shouldBe 29
-        DiagonalConstraint.units(classic) shouldBe listOf(
+        DiagonalConstraint.units(emptyList()) shouldBe listOf(
             listOf(0, 10, 20, 30, 40, 50, 60, 70, 80),
             listOf(8, 16, 24, 32, 40, 48, 56, 64, 72),
         )
@@ -42,7 +42,7 @@ class ConstraintTest {
     fun `killer adds its cages`() {
         val units = constraintsFor(Variant.KILLER).units(killer)
         units.size shouldBe 27 + CAGES.size
-        CageConstraint.units(killer) shouldBe CAGES.map { it.cells }
+        CageConstraint.units(killer.cages) shouldBe CAGES.map { it.cells }
     }
 
     @Test
