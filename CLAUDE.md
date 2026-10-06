@@ -57,6 +57,18 @@ The full gate, matching CI: `./gradlew ktlintCheck detekt lint test verifyRobora
 - JUnit 5 + Kotest (assertions, property tests) for plain unit tests; Robolectric tests are JUnit 4 and run through the vintage engine. Robolectric runs at SDK 36 (`src/test/resources/robolectric.properties`).
 - Repository fakes go in `:domain`'s `testFixtures`; prefer them to mocks.
 
+## Architecture
+
+### `:domain` (pure Kotlin, package `io.github.vinaooo.sudokutrio.domain`)
+
+- **Model:** `Grid` (cells 0–80 row by row), `Puzzle(givens, solution, cages)` (validated in `init`), `Board(values, notes)` (0 = empty), `GameState(puzzle, board, mode, score, mistakes, hintsUsed, moves, elapsedSeconds)`, `GameMode(Variant, Difficulty)`. All `@Serializable`; `isWon` = board equals the solution.
+- **Constraints:** a variant is a list of `Constraint`s (`Row`, `Column`, `Box`, `Diagonal` for X, `Cage` for Killer) from `constraintsFor(variant)`; each yields groups of cells whose digits never repeat. `units(puzzle).peersOf(cell)` gives the cells a digit sees. A new variant adds constraints, not rules.
+- **Rules:** `SudokuRules` (a `RuleSet`) dispatches to one `MoveRule` per `Move` (`Place`, `Erase`, `ToggleNote`). Givens are never editable; a won game accepts nothing. Placing clears the cell's notes and that digit from every peer's notes; a digit ≠ solution adds a mistake (`ScoreEvent.Mistake`).
+- **Engine:** `GameEngine.newGame/apply/tick/legalMoves/isLegal`; `apply` returns `MoveOutcome.Applied(state, events)` or `Rejected`, counts the move and scores the events. `tick` charges each new second until the game is won.
+- **Scoring:** `ScoringStrategy` (`startingScore`, `pointsFor`, `bounded`, `rankingOrder`) picked by `scoringFor(mode)`; only `PointsScoring` so far.
+- **Conflicts:** `ConflictFinder` returns cells with a repeated digit in any group, plus whole cages over their sum (or full with a different sum).
+- **History:** `UndoHistory` stacks `Board` snapshots only: undo/redo never touch score, mistakes, hints or clock; redo counts a move. `GameSession(seed, state, history)` plays, undoes, redoes and ticks; a won session can't undo.
+
 ## Git
 
 Only `master` is long-lived: branch from it and open PRs against it; the user merges with merge commits. One PR per milestone; wait for the merge before stacking the next one. Commit, push and open PRs only when the user asks. CI runs on every PR and on pushes to `master`; Pitest runs nightly.
