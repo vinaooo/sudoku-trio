@@ -14,7 +14,7 @@ Sudoku Trio is an open-source (MIT) Sudoku for Android, to be published on Googl
 - **Score:** base 1000 / 2000 / 4000 / 8000 (easy → expert) × variant factor (Classic 1.0, X 1.2, Killer 1.5), −1 per second, −100 per mistake, −200 per hint, clamped at 0. Ranking: highest score, per variant + difficulty.
 - **Number pad:** `1 2 3 4 5` / `6 7 8 9 Erase` / full-width Notes toggle.
 - **Hint:** first tap highlights the cells and names the technique; second tap places the digit. Counted once, at the reveal. If a wrong digit is on the board, the hint points at it first.
-- **Generation:** at runtime from a seed; difficulty = the hardest technique the logical solver needs. Killer: a few givens on easy/medium, cages only on hard/expert.
+- **Generation:** at runtime from a seed. Difficulty = the solver's **score** (each step's technique weight added up) falling in a per-variant band, plus the techniques each level may use (user's choice over "hardest technique", which reached Classic hard/expert in under 10% of puzzles). Killer keeps a few givens at every level when its cages alone aren't enough (user's choice; cages-only boards were logically solvable in ~3% of layouts).
 - Placing a digit removes it from the notes of every cell it sees; undo restores them. Mistakes survive undo.
 - Variant and difficulty are chosen in Settings only. No contextual toolbar button, no stuck detection, no time limit.
 
@@ -28,7 +28,8 @@ JDK 21 and Android SDK Platform 37 are required (compileSdk 37, targetSdk 36, mi
 ./gradlew ktlintCheck detekt lint                # static analysis (ktlintFormat fixes formatting)
 ./gradlew test koverVerify                       # all unit tests (screenshots included) + coverage gates
 ./gradlew recordRoborazziDebug                   # re-record screenshot goldens after an intended UI change
-./gradlew :domain:pitest                         # mutation testing (gate: 80% killed, 90% coverage)
+./gradlew :domain:pitest                         # mutation testing (gate: 80% killed, 90% coverage); ~3.5 min
+./gradlew :domain:benchmarkGenerator -Pseeds=30  # generation time, givens, difficulty hit rate and uniqueness per mode
 ./gradlew :app:assembleRelease                   # minified (R8) release APK, signed when the upload key is configured
 adb shell am start -n io.github.vinaooo.SudokuTrio/io.github.vinaooo.sudokutrio.MainActivity   # launch: applicationId and Kotlin package differ in case
 ```
@@ -67,6 +68,12 @@ The full gate, matching CI: `./gradlew ktlintCheck detekt lint test verifyRobora
 - **Engine:** `GameEngine.newGame/apply/tick/legalMoves/isLegal`; `apply` returns `MoveOutcome.Applied(state, events)` or `Rejected`, counts the move and scores the events. `tick` charges each new second until the game is won.
 - **Scoring:** `ScoringStrategy` (`startingScore`, `pointsFor`, `bounded`, `rankingOrder`) picked by `scoringFor(mode)`; only `PointsScoring` so far.
 - **Conflicts:** `ConflictFinder` returns cells with a repeated digit in any group, plus whole cages over their sum (or full with a different sum).
+- **Solver (`solver`):** `Candidates` (immutable 9-bit masks) + `SolverContext` (units, 9-cell houses, rows/columns, cages, Killer innies for the rule of 45, peers). One `Technique` per deduction (`NakedSingle`, `HiddenSingle`, `CageCombination`, `RuleOf45`, `LockedCandidates`, `NakedSubset`, `HiddenSubset`, `Fish` for X-wing/swordfish, `XyWing`); each returns a `Deduction` (placement or eliminations) or null. `TechniqueKind` holds each technique's minimum `Difficulty` and score `weight`. No technique assumes uniqueness, so a full logical solve proves the puzzle has one solution. Hidden singles/subsets, locked-candidate sources and the rule of 45 use only 9-cell houses (a cage needn't hold every digit); naked subsets work in any group.
+- **`LogicalSolver`:** restarts from the cheapest technique after each step; `solve(puzzle, variant, maxDifficulty)` returns values, solved and score; `nextPlacement` drives hints.
+- **Generator (`generator`):** `FullGridBuilder` (seeded backtracking per variant), `CagePartitioner` (Killer cages of 2–4 side-by-side cells, distinct digits), `DifficultyBands` (score bands per variant, tuned with `benchmarkGenerator`), `SeededPuzzleGenerator`: digs clues (symmetric pairs for Classic/X) while the solver, capped at the target level, still solves within the band's ceiling; up to 20 attempts, counted not timed, so a seed gives the same puzzle on every device; cancellable. `SolutionCounter` (test sources) independently checks uniqueness.
+- **Hints:** `HintEngine` → `Hint.WrongDigit` first, else `Hint.Placement` from the board's digits (never the player's notes), else a revealed cell (`technique = null`). When eliminations must come first, `nextPlacement` credits the placement to the hardest of them (by weight) and highlights its cells plus the target, so the hint names the step the player actually needs. `Move.RevealHint` sets `GameState.pendingHint`, counts the hint (−200) and is neither a move nor undoable; `Move.ApplyHint` writes the digit (or erases the wrong one). Any other move or undo clears the pending hint. `GameSession.play` only pushes history when the board changed.
+- **Codec:** `GameCodec` gzips + Base64s a `GameState` (892 chars for a half-played Killer game with notes) for bug reports; `decodeSession` reads a report's JSON.
+- **Repositories / use cases:** `SavedGameRepository`, `ScoreRepository`, `StatsRepository` (stats per mode), `SettingsRepository`, `SeedSource`, `Clock`; fakes in `testFixtures`. `StartNewGame` (generates on an injected dispatcher, then counts an unfinished game as a loss), `RestartGame` (reuses `state.puzzle`, also a loss if unfinished), `ResumeGame`, `SaveGame`, `FinishGame` (score + win + clear save), `Observe*`.
 - **History:** `UndoHistory` stacks `Board` snapshots only: undo/redo never touch score, mistakes, hints or clock; redo counts a move. `GameSession(seed, state, history)` plays, undoes, redoes and ticks; a won session can't undo.
 
 ## Git

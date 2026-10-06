@@ -26,7 +26,9 @@ class GameEngine(
     fun apply(state: GameState, move: Move): MoveOutcome {
         if (!rules.isLegal(state, move)) return MoveOutcome.Rejected
         val transition = rules.perform(state, move)
-        val next = transition.state.copy(moves = state.moves + 1).withPoints(transition.events)
+        // Revealing a hint only shows it: not a move.
+        val moves = if (move == Move.RevealHint) state.moves else state.moves + 1
+        val next = transition.state.copy(moves = moves).withPoints(transition.events)
         return MoveOutcome.Applied(next, transition.events)
     }
 

@@ -1,7 +1,9 @@
 package io.github.vinaooo.sudokutrio.domain.rules
 
+import io.github.vinaooo.sudokutrio.domain.hint.HintEngine
 import io.github.vinaooo.sudokutrio.domain.model.GameState
 import io.github.vinaooo.sudokutrio.domain.model.Grid
+import io.github.vinaooo.sudokutrio.domain.model.Hint
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.scoring.ScoreEvent
 
@@ -53,4 +55,25 @@ internal object ToggleNoteRule : MoveRule<Move.ToggleNote> {
         val toggled = if (move.digit in notes) notes - move.digit else notes + move.digit
         return Transition(state.copy(board = state.board.withNotes(move.cell, toggled)))
     }
+}
+
+/** Shows the next hint and counts it, without touching the board. One hint at a time. */
+internal class RevealHintRule(private val hints: HintEngine) : MoveRule<Move.RevealHint> {
+    override fun isLegal(state: GameState, move: Move.RevealHint) = state.pendingHint == null
+
+    override fun perform(state: GameState, move: Move.RevealHint) = Transition(
+        state.copy(pendingHint = hints.hintFor(state), hintsUsed = state.hintsUsed + 1),
+        listOf(ScoreEvent.HintUsed),
+    )
+}
+
+/** Carries out the hint on show: writes its digit, which is right, or erases the wrong digit it points at. */
+internal object ApplyHintRule : MoveRule<Move.ApplyHint> {
+    override fun isLegal(state: GameState, move: Move.ApplyHint) = state.pendingHint != null
+
+    override fun perform(state: GameState, move: Move.ApplyHint): Transition =
+        when (val hint = checkNotNull(state.pendingHint)) {
+            is Hint.Placement -> PlaceRule.perform(state, Move.Place(hint.cell, hint.digit))
+            is Hint.WrongDigit -> EraseRule.perform(state, Move.Erase(hint.cell))
+        }
 }

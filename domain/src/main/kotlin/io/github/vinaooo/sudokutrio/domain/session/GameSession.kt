@@ -17,7 +17,11 @@ data class GameSession(val seed: Long, val state: GameState, val history: UndoHi
     val isInProgress: Boolean get() = state.moves > 0 && !state.isWon
 
     fun play(move: Move, engine: GameEngine): GameSession? = when (val outcome = engine.apply(state, move)) {
-        is MoveOutcome.Applied -> copy(state = outcome.state, history = history.push(state))
+        // Only a move that changes the board can be undone: revealing a hint can't.
+        is MoveOutcome.Applied -> copy(
+            state = outcome.state,
+            history = if (outcome.state.board != state.board) history.push(state) else history,
+        )
         MoveOutcome.Rejected -> null
     }
 

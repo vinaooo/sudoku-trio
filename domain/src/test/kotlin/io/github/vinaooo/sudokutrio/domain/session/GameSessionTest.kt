@@ -40,9 +40,9 @@ class GameSessionTest {
 
     @Test
     fun `undo restores the board but keeps the clock, moves, mistakes and score`() {
-        val played = fresh.play(Move.ToggleNote(2, 7)).play(Move.Place(0, wrongDigit(0))).tick(12, engine)
+        val played = fresh.play(Move.ToggleNote(3, 7)).play(Move.Place(0, wrongDigit(0))).tick(12, engine)
         val undone = played.undo().shouldNotBeNull()
-        undone.state.board shouldBe fresh.play(Move.ToggleNote(2, 7)).state.board
+        undone.state.board shouldBe fresh.play(Move.ToggleNote(3, 7)).state.board
         undone.state.moves shouldBe 2
         undone.state.mistakes shouldBe 1
         undone.state.elapsedSeconds shouldBe 12
@@ -53,9 +53,9 @@ class GameSessionTest {
     @Test
     fun `undo brings back the notes a digit cleared`() {
         val digit = SOLUTION[0]
-        val noted = fresh.play(Move.ToggleNote(2, digit))
+        val noted = fresh.play(Move.ToggleNote(3, digit))
         val placed = noted.play(Move.Place(0, digit))
-        placed.state.board.notes[2] shouldBe emptySet()
+        placed.state.board.notes[3] shouldBe emptySet()
         placed.undo().shouldNotBeNull().state.board shouldBe noted.state.board
     }
 
