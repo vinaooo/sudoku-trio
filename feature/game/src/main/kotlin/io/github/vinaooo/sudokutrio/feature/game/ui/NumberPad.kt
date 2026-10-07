@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.R
@@ -37,9 +38,10 @@ internal fun NumberPad(
     modifier: Modifier = Modifier,
     grid: Boolean = false,
     mirrored: Boolean = false,
+    keyHeight: Dp = KEY_HEIGHT,
 ) {
-    val digit: @Composable RowScope.(Int) -> Unit = { DigitKey(it, it in completed, enabled, onIntent) }
-    val erase: @Composable RowScope.() -> Unit = { EraseKey(enabled, onIntent) }
+    val digit: @Composable RowScope.(Int) -> Unit = { DigitKey(it, it in completed, enabled, onIntent, keyHeight) }
+    val erase: @Composable RowScope.() -> Unit = { EraseKey(enabled, onIntent, keyHeight) }
     Column(modifier.padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(KEY_GAP)) {
         if (grid) {
             for (row in 0 until GRID_ROWS) {
@@ -61,24 +63,30 @@ internal fun NumberPad(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun RowScope.EraseKey(enabled: Boolean, onIntent: (GameIntent) -> Unit) {
+private fun RowScope.EraseKey(enabled: Boolean, onIntent: (GameIntent) -> Unit, height: Dp) {
     FilledTonalButton(
         onClick = { onIntent(GameIntent.Erase) },
         enabled = enabled,
         shapes = ButtonDefaults.shapes(),
-        modifier = Modifier.weight(1f).height(KEY_HEIGHT),
+        modifier = Modifier.weight(1f).height(height),
     ) { Icon(Icons.AutoMirrored.Rounded.Backspace, stringResource(R.string.erase)) }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun RowScope.DigitKey(digit: Int, completed: Boolean, enabled: Boolean, onIntent: (GameIntent) -> Unit) {
+private fun RowScope.DigitKey(
+    digit: Int,
+    completed: Boolean,
+    enabled: Boolean,
+    onIntent: (GameIntent) -> Unit,
+    height: Dp,
+) {
     val description = if (completed) stringResource(R.string.digit_complete, digit) else digit.toString()
     FilledTonalButton(
         onClick = { onIntent(GameIntent.Digit(digit)) },
         enabled = enabled,
         shapes = ButtonDefaults.shapes(),
-        modifier = Modifier.weight(1f).height(KEY_HEIGHT).semantics { contentDescription = description },
+        modifier = Modifier.weight(1f).height(height).semantics { contentDescription = description },
     ) {
         Text(
             digit.toString(),
@@ -89,7 +97,7 @@ private fun RowScope.DigitKey(digit: Int, completed: Boolean, enabled: Boolean, 
 }
 
 private val KEY_GAP = 6.dp
-private val KEY_HEIGHT = 56.dp
+internal val KEY_HEIGHT = 56.dp
 private const val GRID_ROWS = 3
 private const val GRID_COLUMNS = 3
 
