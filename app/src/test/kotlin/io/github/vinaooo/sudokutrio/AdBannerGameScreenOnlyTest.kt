@@ -32,7 +32,7 @@ class AdBannerGameScreenOnlyTest {
 
     @Test
     fun `the banner is on the game screen and not on scores or settings`() {
-        compose.onNodeWithText("Notes").assertExists()
+        compose.onNodeWithContentDescription("Notes").assertExists()
         compose.onNodeWithTag(AdBannerProvider.TEST_TAG).assertExists()
 
         compose.onNodeWithContentDescription("Scores").performClick()
