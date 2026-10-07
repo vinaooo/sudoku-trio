@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.runtime.Composable
@@ -64,21 +66,49 @@ internal fun PortraitGame(
             }
             NavigationButtons(onOpenScores, onOpenSettings)
         }
-        BoardArea(
-            uiState,
-            onIntent,
-            layout,
-            Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp, vertical = 4.dp),
-        )
         val controls = remember(uiState) { uiState.controls() }
-        NumberPad(controls.completed, controls.toolbar.enabled, onIntent, mirrored = mirrored)
-        GameToolbar(
-            controls.toolbar,
-            onIntent,
-            Modifier.align(Alignment.CenterHorizontally).padding(vertical = 12.dp),
-            mirrored = mirrored,
-        )
+        val padAndToolbar: @Composable () -> Unit = {
+            NumberPad(controls.completed, controls.toolbar.enabled, onIntent, mirrored = mirrored)
+            GameToolbar(controls.toolbar, onIntent, Modifier.padding(vertical = 12.dp), mirrored = mirrored)
+        }
+        if (layout.phoneView) {
+            // Phone view: board, pad and toolbar as one phone-wide column on the chosen side, the pad right under the
+            // board, at the top or bottom of the room.
+            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = layout.columnAlignment()) {
+                Column(Modifier.width(PHONE_WIDTH), horizontalAlignment = Alignment.CenterHorizontally) {
+                    BoardArea(
+                        uiState,
+                        onIntent,
+                        layout.copy(phoneView = false),
+                        Modifier.fillMaxWidth().aspectRatio(1f).padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                    padAndToolbar()
+                }
+            }
+        } else {
+            BoardArea(
+                uiState,
+                onIntent,
+                layout,
+                Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+            // On a tablet the keys would stretch across the screen: the pad keeps a phone's proportions.
+            Column(
+                Modifier.widthIn(max = PORTRAIT_PAD_MAX_WIDTH).align(Alignment.CenterHorizontally),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) { padAndToolbar() }
+        }
     }
+}
+
+/** Where phone view's column sits: the chosen side, at the top or bottom per the board position. */
+private fun BoardLayout.columnAlignment(): Alignment {
+    val horizontal = when (side) {
+        PhoneViewSide.LEFT -> -1f
+        PhoneViewSide.CENTER -> 0f
+        PhoneViewSide.RIGHT -> 1f
+    }
+    return BiasAlignment(horizontal, if (alignment == BoardAlignment.BOTTOM) 1f else -1f)
 }
 
 @Composable
@@ -89,6 +119,7 @@ internal fun LandscapeGame(
     mirrored: Boolean,
     onOpenScores: (() -> Unit)?,
     onOpenSettings: (() -> Unit)?,
+    large: Boolean = false,
 ) {
     val info: @Composable () -> Unit = {
         Column(
@@ -118,8 +149,9 @@ internal fun LandscapeGame(
                 state.completed,
                 state.toolbar.enabled,
                 onIntent,
-                Modifier.width(PAD_WIDTH),
+                Modifier.width(if (large) LARGE_PAD_WIDTH else PAD_WIDTH),
                 grid = true,
+                keyHeight = if (large) LARGE_KEY_HEIGHT else KEY_HEIGHT,
                 mirrored = mirrored,
             )
             if (!mirrored) toolbar()

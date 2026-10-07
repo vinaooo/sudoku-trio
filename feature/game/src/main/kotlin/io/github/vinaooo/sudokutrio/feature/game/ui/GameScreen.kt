@@ -129,7 +129,16 @@ private fun GameContent(
     val mirrored = settings.handedness == Handedness.LEFT
     BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
         if (maxWidth > maxHeight) {
-            LandscapeGame(uiState, onIntent, layout, mirrored, onOpenScores, onOpenSettings)
+            LandscapeGame(
+                uiState,
+                onIntent,
+                layout,
+                mirrored,
+                onOpenScores,
+                onOpenSettings,
+                large =
+                maxWidth >= LARGE_LANDSCAPE,
+            )
         } else {
             PortraitGame(uiState, onIntent, layout, mirrored, onOpenScores, onOpenSettings)
         }
@@ -165,6 +174,14 @@ internal const val BOARD_TAG = "board"
 internal val TOP_REGION = 88.dp
 internal val SIDE_WIDTH = 200.dp
 internal val PAD_WIDTH = 184.dp
+
+/** On a tablet, landscape's pad has room for bigger keys. */
+internal val LARGE_LANDSCAPE = 1000.dp
+internal val LARGE_PAD_WIDTH = 280.dp
+internal val LARGE_KEY_HEIGHT = 72.dp
+
+/** A phone's pad width: on a tablet in portrait the pad and toolbar keep it, centered. */
+internal val PORTRAIT_PAD_MAX_WIDTH = 480.dp
 
 /** Phone view's board width: a typical modern phone's (412dp), as in Solo. */
 internal val PHONE_WIDTH = 412.dp
