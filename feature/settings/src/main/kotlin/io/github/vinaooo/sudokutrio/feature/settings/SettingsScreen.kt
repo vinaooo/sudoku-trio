@@ -90,7 +90,7 @@ fun SettingsScreen(
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
             val scroll = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             if (maxWidth >= TWO_COLUMNS_WIDTH.dp) {
-                // A tablet (or a phone on its side): the game's card beside the rest.
+                // A tablet (or a phone on its side): Game, Feedback and Privacy left, Appearance right.
                 Box(scroll, contentAlignment = Alignment.TopCenter) {
                     Row(
                         modifier = Modifier.widthIn(
@@ -98,14 +98,14 @@ fun SettingsScreen(
                         ).padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        Column(Modifier.weight(1f)) { SectionCard { GameSection(settings, onChange) } }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            SectionCard { AppearanceSection(settings, onChange) }
+                            SectionCard { GameSection(settings, onChange) }
                             SectionCard { FeedbackSection(settings, onChange) }
                             SectionCard {
                                 PrivacySection(privacyOptionsRequired, onOpenPrivacyOptions, onOpenPrivacyPolicy)
                             }
                         }
+                        Column(Modifier.weight(1f)) { SectionCard { AppearanceSection(settings, onChange) } }
                     }
                 }
             } else {

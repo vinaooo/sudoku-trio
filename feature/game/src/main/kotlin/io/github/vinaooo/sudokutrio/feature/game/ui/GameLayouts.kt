@@ -80,7 +80,10 @@ internal fun PortraitGame(
                         uiState,
                         onIntent,
                         layout.copy(phoneView = false),
-                        Modifier.fillMaxWidth().aspectRatio(1f).padding(horizontal = 8.dp, vertical = 4.dp),
+                        // Measured after the pad and toolbar: a short screen shrinks the board.
+                        Modifier.weight(1f, fill = false)
+                            .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                     )
                     padAndToolbar()
                 }

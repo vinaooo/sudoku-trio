@@ -34,33 +34,6 @@ internal fun GameSection(settings: Settings, onChange: (SettingsChange) -> Unit)
         onSelect = { onChange(SettingsChange.VariantChanged(it)) },
     )
     DifficultyChoice(settings.mode.difficulty) { onChange(SettingsChange.DifficultyChanged(it)) }
-    // Only a tablet (Material's medium window and up) has room to spare; a phone already shows a phone's cards.
-    if (LocalConfiguration.current.smallestScreenWidthDp >= TABLET_WIDTH_DP) {
-        ToggleRow(
-            title = stringResource(R.string.phone_view),
-            supporting = stringResource(R.string.phone_view_note),
-            checked = settings.phoneView,
-        ) { onChange(SettingsChange.PhoneViewChanged(it)) }
-        // Revealed from behind the switch above it, as if it had been tucked under it.
-        AnimatedVisibility(
-            visible = settings.phoneView,
-            enter = expandVertically(MaterialTheme.motionScheme.defaultSpatialSpec(), Alignment.Top) +
-                fadeIn(MaterialTheme.motionScheme.defaultEffectsSpec()),
-            exit = shrinkVertically(MaterialTheme.motionScheme.defaultSpatialSpec(), Alignment.Top) +
-                fadeOut(MaterialTheme.motionScheme.defaultEffectsSpec()),
-        ) {
-            Choice(
-                title = stringResource(R.string.phone_view_side),
-                options = listOf(
-                    PhoneViewSide.LEFT to R.string.side_left,
-                    PhoneViewSide.CENTER to R.string.side_center,
-                    PhoneViewSide.RIGHT to R.string.side_right,
-                ),
-                selected = settings.phoneViewSide,
-                onSelect = { onChange(SettingsChange.PhoneViewSideChanged(it)) },
-            )
-        }
-    }
 }
 
 private const val TABLET_WIDTH_DP = 600
@@ -111,6 +84,38 @@ internal fun AppearanceSection(settings: Settings, onChange: (SettingsChange) ->
         selected = settings.boardAlignment,
         onSelect = { onChange(SettingsChange.BoardAlignmentChanged(it)) },
     )
+    PhoneViewRows(settings, onChange)
+}
+
+@Composable
+private fun PhoneViewRows(settings: Settings, onChange: (SettingsChange) -> Unit) {
+    // Only a tablet (Material's medium window and up) has room to spare; a phone already shows a phone's cards.
+    if (LocalConfiguration.current.smallestScreenWidthDp >= TABLET_WIDTH_DP) {
+        ToggleRow(
+            title = stringResource(R.string.phone_view),
+            supporting = stringResource(R.string.phone_view_note),
+            checked = settings.phoneView,
+        ) { onChange(SettingsChange.PhoneViewChanged(it)) }
+        // Revealed from behind the switch above it, as if it had been tucked under it.
+        AnimatedVisibility(
+            visible = settings.phoneView,
+            enter = expandVertically(MaterialTheme.motionScheme.defaultSpatialSpec(), Alignment.Top) +
+                fadeIn(MaterialTheme.motionScheme.defaultEffectsSpec()),
+            exit = shrinkVertically(MaterialTheme.motionScheme.defaultSpatialSpec(), Alignment.Top) +
+                fadeOut(MaterialTheme.motionScheme.defaultEffectsSpec()),
+        ) {
+            Choice(
+                title = stringResource(R.string.phone_view_side),
+                options = listOf(
+                    PhoneViewSide.LEFT to R.string.side_left,
+                    PhoneViewSide.CENTER to R.string.side_center,
+                    PhoneViewSide.RIGHT to R.string.side_right,
+                ),
+                selected = settings.phoneViewSide,
+                onSelect = { onChange(SettingsChange.PhoneViewSideChanged(it)) },
+            )
+        }
+    }
 }
 
 @Composable

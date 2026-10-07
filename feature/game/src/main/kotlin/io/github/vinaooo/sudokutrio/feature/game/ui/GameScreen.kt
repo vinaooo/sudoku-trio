@@ -128,7 +128,8 @@ private fun GameContent(
     )
     val mirrored = settings.handedness == Handedness.LEFT
     BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
-        if (maxWidth > maxHeight) {
+        // Phone view keeps its column (pad under the board) in landscape too.
+        if (maxWidth > maxHeight && !layout.phoneView) {
             LandscapeGame(
                 uiState,
                 onIntent,
