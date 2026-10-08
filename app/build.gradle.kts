@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.sudokutrio.android.application)
-    alias(libs.plugins.sudokutrio.android.compose)
-    alias(libs.plugins.sudokutrio.hilt)
+    alias(libs.plugins.vinkit.android.application)
+    alias(libs.plugins.vinkit.android.compose)
+    alias(libs.plugins.vinkit.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.roborazzi)
 }

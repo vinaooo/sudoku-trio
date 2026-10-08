@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.sudokutrio.android.library)
-    alias(libs.plugins.sudokutrio.hilt)
+    alias(libs.plugins.vinkit.android.library)
+    alias(libs.plugins.vinkit.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 

@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.sudokutrio.android.library)
-    alias(libs.plugins.sudokutrio.android.compose)
+    alias(libs.plugins.vinkit.android.library)
+    alias(libs.plugins.vinkit.android.compose)
 }
 
 android {
