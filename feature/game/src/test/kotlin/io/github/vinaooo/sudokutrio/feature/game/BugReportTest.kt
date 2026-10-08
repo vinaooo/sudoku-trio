@@ -7,7 +7,7 @@ import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
-import io.github.vinaooo.sudokutrio.domain.session.GameCodec
+import io.github.vinaooo.sudokutrio.domain.session.BoardCodec
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -45,7 +45,7 @@ class BugReportTest {
         body shouldContain "Settings: KILLER HARD, RIGHT hand"
         body shouldContain "Game: seed 77, KILLER HARD, 1 moves, 1 mistakes, 1 hints"
         val code = body.substringAfter("State:\n```\n").substringBefore("\n```")
-        GameCodec.decode(code) shouldBe session.state
+        BoardCodec.decode(code) shouldBe session.state
     }
 
     @Test

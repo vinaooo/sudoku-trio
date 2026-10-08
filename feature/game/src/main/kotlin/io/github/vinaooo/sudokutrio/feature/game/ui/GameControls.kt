@@ -51,13 +51,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import io.github.vinaooo.sudokutrio.core.ui.formatElapsed
 import io.github.vinaooo.sudokutrio.core.ui.modeName
-import io.github.vinaooo.sudokutrio.core.ui.spokenElapsed
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Hint
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.R
+import io.github.vinaooo.vinkit.core.formatElapsed
+import io.github.vinaooo.vinkit.designsystem.spokenElapsed
 
 /**
  * The mode and the clock, read by TalkBack as one item; [large] in landscape's side column, which has the room. Only

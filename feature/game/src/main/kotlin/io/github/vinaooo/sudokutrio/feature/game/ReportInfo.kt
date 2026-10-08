@@ -8,7 +8,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.session.GameCodec
+import io.github.vinaooo.sudokutrio.domain.session.BoardCodec
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import java.io.File
 import java.net.URLEncoder
@@ -47,11 +47,11 @@ internal fun reportBody(info: ReportInfo, description: String): String = buildSt
                     "$hintsUsed hints, score $score, ${elapsedSeconds}s",
             )
         }
-        // The exact board, for the debug build to replay (GameCodec).
+        // The exact board, for the debug build to replay (BoardCodec).
         appendLine()
         appendLine("State:")
         appendLine("```")
-        appendLine(GameCodec.encode(it.state))
+        appendLine(BoardCodec.encode(it.state))
         appendLine("```")
     }
 }.trimEnd()

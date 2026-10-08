@@ -36,12 +36,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.vinaooo.sudokutrio.core.ui.formatElapsed
 import io.github.vinaooo.sudokutrio.core.ui.modeName
-import io.github.vinaooo.sudokutrio.core.ui.spokenElapsed
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.GameStats
 import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
+import io.github.vinaooo.vinkit.core.formatElapsed
+import io.github.vinaooo.vinkit.designsystem.spokenElapsed
 import java.text.DateFormat
 import java.util.Date
 

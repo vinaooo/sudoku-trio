@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 
-class GameCodecTest {
+class BoardCodecTest {
     private val engine = GameEngine()
 
     /** A Killer game half played, with notes in every empty cell and a hint on show. */
@@ -37,19 +37,19 @@ class GameCodecTest {
     @Test
     fun `a state survives the codec`() = runTest {
         val state = midGame().state
-        GameCodec.decode(GameCodec.encode(state)) shouldBe state
+        BoardCodec.decode(BoardCodec.encode(state)) shouldBe state
     }
 
     @Test
     fun `the code is short enough for an issue and tolerates line breaks`() = runTest {
-        val code = GameCodec.encode(midGame().state)
+        val code = BoardCodec.encode(midGame().state)
         code.length shouldBeLessThan 1_500
-        GameCodec.decode(code.chunked(60).joinToString("\n", postfix = "\n")) shouldBe GameCodec.decode(code)
+        BoardCodec.decode(code.chunked(60).joinToString("\n", postfix = "\n")) shouldBe BoardCodec.decode(code)
     }
 
     @Test
     fun `a whole session comes back from its JSON`() = runTest {
         val session = midGame()
-        GameCodec.decodeSession(Json.encodeToString(GameSession.serializer(), session)) shouldBe session
+        decodeSession(Json.encodeToString(GameSession.serializer(), session)) shouldBe session
     }
 }
