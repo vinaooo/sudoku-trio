@@ -6,10 +6,13 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.key
+import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.core.ScoreRecord
+import io.github.vinaooo.vinkit.core.ThemeMode
+import io.github.vinaooo.vinkit.scores.ModeSection
+import io.github.vinaooo.vinkit.scores.ScoresUiState
 import java.util.TimeZone
 import org.junit.Rule
 import org.junit.Test
@@ -32,8 +35,16 @@ class ScoresScreenScreenshotTest {
     )
 
     /** Noon UTC on 1 January 2026 and the days after, so no time zone moves a date. */
-    private fun record(points: Int, seconds: Long, mistakes: Int, hints: Int, day: Int) =
-        ScoreRecord(modes[0], points, seconds, mistakes, hints, NOON + day * DAY)
+    private fun record(points: Int, seconds: Long, mistakes: Int, hints: Int, day: Int) = ScoreRecord(
+        modes[0].key,
+        points,
+        seconds,
+        NOON + day * DAY,
+        mapOf(
+            "mistakes" to "$mistakes",
+            "hints" to "$hints",
+        ),
+    )
 
     private fun capture(name: String, themeMode: ThemeMode) {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
@@ -41,16 +52,23 @@ class ScoresScreenScreenshotTest {
             SudokuTrioTheme(themeMode = themeMode, dynamicColor = false) {
                 ScoresScreen(
                     ScoresUiState(
-                        scores = listOf(
-                            record(912, 88, 0, 0, 3),
-                            record(845, 155, 0, 0, 1),
-                            record(640, 160, 2, 0, 0),
-                            record(395, 205, 2, 2, 5),
-                        ),
-                        stats = GameStats(played = 7, won = 4, currentStreak = 2, bestStreak = 3),
                         isLoading = false,
-                        modes = modes,
-                        mode = modes[0],
+                        groups = listOf("CLASSIC", "X", "KILLER"),
+                        group = "CLASSIC",
+                        sections = listOf(
+                            ModeSection(
+                                modes[0].key,
+                                GameStats(played = 7, won = 4, currentStreak = 2, bestStreak = 3),
+                                listOf(
+                                    record(912, 88, 0, 0, 3),
+                                    record(845, 155, 0, 0, 1),
+                                    record(640, 160, 2, 0, 0),
+                                    record(395, 205, 2, 2, 5),
+                                ),
+                            ),
+                        ) + listOf(Difficulty.MEDIUM, Difficulty.HARD, Difficulty.EXPERT).map {
+                            ModeSection(GameMode(Variant.CLASSIC, it).key)
+                        },
                     ),
                     onBack = {},
                 )

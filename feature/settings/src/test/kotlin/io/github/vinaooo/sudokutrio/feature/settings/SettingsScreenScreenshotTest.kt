@@ -5,7 +5,8 @@ import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.ThemeMode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +23,13 @@ class SettingsScreenScreenshotTest {
     private fun capture(name: String, themeMode: ThemeMode) {
         compose.setContent {
             SudokuTrioTheme(themeMode = themeMode, dynamicColor = false) {
-                SettingsScreen(Settings(themeMode = themeMode, dynamicColor = false), {}, onBack = {})
+                SettingsScreen(
+                    Settings(),
+                    AppSettings(themeMode = themeMode, dynamicColor = false),
+                    {},
+                    {},
+                    onBack = {},
+                )
             }
         }
         compose.onRoot().captureRoboImage("src/test/screenshots/$name.png")

@@ -1,5 +1,6 @@
 package io.github.vinaooo.sudokutrio.feature.settings
 
+import io.github.vinaooo.sudokutrio.domain.fake.FakeAppSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
@@ -7,12 +8,12 @@ import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test
 class SettingsViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val repository = FakeSettingsRepository()
+    private val appRepository = FakeAppSettingsRepository()
     private val saved = FakeSavedGameRepository()
     private val engine = GameEngine()
     private val solution = (
@@ -46,7 +48,7 @@ class SettingsViewModelTest {
     @AfterEach
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun TestScope.viewModel() = SettingsViewModel(repository, ResumeGame(saved)).also {
+    private fun TestScope.viewModel() = SettingsViewModel(repository, appRepository, ResumeGame(saved)).also {
         backgroundScope.launch { it.settings.collect {} }
         runCurrent()
     }
@@ -54,11 +56,11 @@ class SettingsViewModelTest {
     @Test
     fun `an appearance change is saved at once`() = runTest(dispatcher) {
         val vm = viewModel()
-        vm.onChange(SettingsChange.ThemeModeChanged(ThemeMode.DARK))
-        vm.onChange(SettingsChange.ThemeColorChanged(ThemeColor.ORANGE))
+        vm.onAppChange { it.copy(themeMode = ThemeMode.DARK) }
+        vm.onAppChange { it.copy(themeColor = ThemeColor.ORANGE) }
         runCurrent()
-        repository.settings.value.themeMode shouldBe ThemeMode.DARK
-        repository.settings.value.themeColor shouldBe ThemeColor.ORANGE
+        appRepository.current.value.themeMode shouldBe ThemeMode.DARK
+        appRepository.current.value.themeColor shouldBe ThemeColor.ORANGE
         vm.pendingChange.value.shouldBeNull()
     }
 

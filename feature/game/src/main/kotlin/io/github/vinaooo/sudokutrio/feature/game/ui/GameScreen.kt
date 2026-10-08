@@ -1,49 +1,45 @@
 package io.github.vinaooo.sudokutrio.feature.game.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.rememberGraphicsLayer
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.roundToIntRect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
-import io.github.vinaooo.sudokutrio.domain.model.Handedness
-import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
+import io.github.vinaooo.sudokutrio.core.ui.modeName
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.GameUiState
 import io.github.vinaooo.sudokutrio.feature.game.GameViewModel
 import io.github.vinaooo.sudokutrio.feature.game.R
+import io.github.vinaooo.sudokutrio.feature.game.SudokuTrioReports
 import io.github.vinaooo.sudokutrio.feature.game.board.CellHighlighter
 import io.github.vinaooo.sudokutrio.feature.game.board.SudokuBoard
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import io.github.vinaooo.sudokutrio.feature.game.board.completedDigits
+import io.github.vinaooo.sudokutrio.feature.game.gameReport
+import io.github.vinaooo.vinkit.shell.FrameInfo
+import io.github.vinaooo.vinkit.shell.GameFrame
+import io.github.vinaooo.vinkit.shell.GameSurface
+import io.github.vinaooo.vinkit.shell.GameToolbar
+import io.github.vinaooo.vinkit.shell.ModeAndTime
+import io.github.vinaooo.vinkit.shell.WinDialog
 
 /** The game screen. The Scores and Settings buttons show only when their screens exist ([onOpenScores] non-null). */
 @Composable
@@ -61,6 +57,10 @@ fun GameRoute(
     GameScreen(uiState, viewModel::onIntent, modifier, onOpenScores, onOpenSettings)
 }
 
+/**
+ * vinkit's frame with Sudoku's parts: the mode and clock (or the hint in their place, so the board never moves), the
+ * board, the number pad and the toolbar. A left hand mirrors the pad and toolbar.
+ */
 @Composable
 fun GameScreen(
     uiState: GameUiState,
@@ -69,85 +69,116 @@ fun GameScreen(
     onOpenScores: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
 ) {
-    // The screen as last drawn, for a bug report's screenshot.
-    val frame = rememberGraphicsLayer()
-    var report by remember { mutableStateOf<BugReport?>(null) }
-    val scope = rememberCoroutineScope()
-    val handle: (GameIntent) -> Unit = { intent ->
-        if (intent == GameIntent.ReportBug) {
-            // After the menu and its scrim have gone, so the screenshot shows the board as it was.
-            scope.launch {
-                delay(MENU_CLOSED_MILLIS)
-                report = BugReport(frame.toImageBitmap())
-            }
-        } else {
-            onIntent(intent)
-        }
-    }
-    var area by remember { mutableStateOf(IntRect.Zero) }
-    Surface(
-        modifier = modifier.fillMaxSize()
-            .onGloballyPositioned { area = it.boundsInWindow().roundToIntRect() }
-            .drawWithContent {
-                frame.record { this@drawWithContent.drawContent() }
-                drawLayer(frame)
+    val announced = uiState.announcement
+    GameSurface(
+        announcement = announced?.let { announcementText(it.announcement) },
+        announcementSequence = announced?.sequence ?: 0,
+        modifier = modifier,
+        reportTarget = SudokuTrioReports,
+        gameReport = { gameReport(uiState.settings, uiState.appSettings, uiState.session) },
+    ) { reportBug ->
+        val controls = remember(uiState) { uiState.controls() }
+        GameFrame(
+            settings = uiState.appSettings,
+            info = { GameInfo(uiState, it) },
+            board = { BoardOrLoading(uiState, onIntent) },
+            toolbar = { frame ->
+                GameToolbar(
+                    actions = toolbarActions(controls.toolbar, onIntent),
+                    menuOptions = menuOptions(onIntent),
+                    onReportBug = reportBug,
+                    vertical = frame.landscape,
+                    mirrored = frame.mirrored,
+                )
             },
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-    ) {
-        // Surface stretches each direct child to its full size, so the tiny announcer sits in a Box of its own.
-        Box {
-            CompositionLocalProvider(LocalGameArea provides area) {
-                GameContent(uiState, handle, onOpenScores, onOpenSettings)
-            }
-            Announcer(uiState.announcement)
-        }
+            controls = { frame -> Pad(controls, onIntent, frame) },
+            onOpenScores = onOpenScores,
+            onOpenSettings = onOpenSettings,
+        )
     }
-    uiState.winRecord?.let { WinDialog(it, onNewGame = { onIntent(GameIntent.NewGame) }) }
-    report?.let { BugReportDialog(uiState, it.screenshot, onDone = { report = null }) }
+    uiState.winRecord?.let { WinDialog(winLines(it), onNewGame = { onIntent(GameIntent.NewGame) }) }
 }
 
 /**
- * Portrait: the top region (mode and clock, or the hint while one shows, so the board never moves), the board at the
- * top or bottom of its room (Settings), the number pad and the toolbar. Landscape: mode, clock and hint on one side,
- * the board centered at full height, the pad and a vertical toolbar on the preferred hand's side. A left hand mirrors
- * the pad and toolbar. On a tablet, phone view keeps the board at a phone's width on the chosen side.
+ * Portrait: the mode and clock, or the hint in their place while one shows. Landscape's side column has room for
+ * both, the clock larger.
  */
 @Composable
-private fun GameContent(
-    uiState: GameUiState,
-    onIntent: (GameIntent) -> Unit,
-    onOpenScores: (() -> Unit)?,
-    onOpenSettings: (() -> Unit)?,
-) {
-    val settings = uiState.settings
-    val layout = BoardLayout(
-        alignment = settings.boardAlignment,
-        phoneView = settings.phoneView && LocalConfiguration.current.smallestScreenWidthDp >= TABLET_WIDTH_DP,
-        side = settings.phoneViewSide,
-    )
-    val mirrored = settings.handedness == Handedness.LEFT
-    BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
-        // Phone view keeps its column (pad under the board) in landscape too.
-        if (maxWidth > maxHeight && !layout.phoneView) {
-            LandscapeGame(
-                uiState,
-                onIntent,
-                layout,
-                mirrored,
-                onOpenScores,
-                onOpenSettings,
-                large =
-                maxWidth >= LARGE_LANDSCAPE,
-            )
-        } else {
-            PortraitGame(uiState, onIntent, layout, mirrored, onOpenScores, onOpenSettings)
+private fun GameInfo(uiState: GameUiState, frame: FrameInfo) {
+    val hint = uiState.session?.state?.pendingHint
+    val modeAndTime: @Composable (Modifier) -> Unit = {
+        ModeAndTime(modeName(uiState.mode()), uiState.elapsedSeconds(), it, large = frame.landscape)
+    }
+    if (frame.landscape) {
+        Column {
+            modeAndTime(Modifier)
+            hint?.let { HintCard(it, Modifier.fillMaxWidth().padding(top = 12.dp)) }
+        }
+    } else {
+        AnimatedContent(targetState = hint, contentKey = { it != null }, label = "top region") { shown ->
+            if (shown != null) {
+                HintCard(shown, Modifier.fillMaxWidth().padding(end = 4.dp))
+            } else {
+                modeAndTime(Modifier)
+            }
         }
     }
 }
 
-/** Where the board sits in its room: Settings' board position, and phone view's width and side. */
-internal data class BoardLayout(val alignment: BoardAlignment, val phoneView: Boolean, val side: PhoneViewSide)
+/** The number pad: two rows in portrait, a 3-column grid in landscape, bigger on a large tablet. */
+@Composable
+private fun Pad(controls: Controls, onIntent: (GameIntent) -> Unit, frame: FrameInfo) {
+    if (frame.landscape) {
+        NumberPad(
+            controls.completed,
+            controls.toolbar.enabled,
+            onIntent,
+            Modifier.width(if (frame.large) LARGE_PAD_WIDTH else PAD_WIDTH),
+            grid = true,
+            keyHeight = if (frame.large) LARGE_KEY_HEIGHT else KEY_HEIGHT,
+            mirrored = frame.mirrored,
+        )
+    } else {
+        NumberPad(controls.completed, controls.toolbar.enabled, onIntent, mirrored = frame.mirrored)
+    }
+}
+
+/** What the pad and toolbar show, worked out once per state. */
+private data class Controls(val completed: Set<Int>, val toolbar: ToolbarState)
+
+private fun GameUiState.controls(): Controls {
+    val session = session
+    val ready = session != null && !loading && !session.state.isWon
+    return Controls(
+        completed = session?.state?.board?.values?.let(::completedDigits).orEmpty(),
+        toolbar = ToolbarState(
+            notesMode = notesMode,
+            canUndo = session?.canUndo == true,
+            canRedo = session?.canRedo == true,
+            hintShown = session?.state?.pendingHint != null,
+            enabled = ready,
+        ),
+    )
+}
+
+private fun GameUiState.mode() = session?.state?.mode ?: settings.mode
+
+private fun GameUiState.elapsedSeconds() = session?.state?.elapsedSeconds ?: 0
+
+/** The board, or the loading indicator while a puzzle is made. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BoardOrLoading(uiState: GameUiState, onIntent: (GameIntent) -> Unit) {
+    val session = uiState.session
+    if (session == null || uiState.loading) {
+        val loading = stringResource(R.string.generating)
+        Box(Modifier.fillMaxSize()) {
+            LoadingIndicator(Modifier.align(Alignment.Center).semantics { contentDescription = loading })
+        }
+    } else {
+        Board(session, uiState.selected, uiState.conflicts, onIntent)
+    }
+}
 
 /** The board with its highlights, worked out only when the board, selection, hint or conflicts change. */
 @Composable
@@ -170,26 +201,8 @@ internal fun Board(session: GameSession, selected: Int?, conflicts: Set<Int>, on
 }
 
 internal const val BOARD_TAG = "board"
-
-/** Holds the mode and clock or, in their place, the hint card: the board below never moves. */
-internal val TOP_REGION = 88.dp
-internal val SIDE_WIDTH = 200.dp
 internal val PAD_WIDTH = 184.dp
 
 /** On a tablet, landscape's pad has room for bigger keys. */
-internal val LARGE_LANDSCAPE = 1000.dp
 internal val LARGE_PAD_WIDTH = 280.dp
 internal val LARGE_KEY_HEIGHT = 72.dp
-
-/** A phone's pad width: on a tablet in portrait the pad and toolbar keep it, centered. */
-internal val PORTRAIT_PAD_MAX_WIDTH = 480.dp
-
-/** Phone view's board width: a typical modern phone's (412dp), as in Solo. */
-internal val PHONE_WIDTH = 412.dp
-
-/** From this short side (Material's medium window), the screen is a tablet's and phone view applies. */
-private const val TABLET_WIDTH_DP = 600
-private const val MENU_CLOSED_MILLIS = 400L
-
-/** A bug report being written, with the board's [screenshot]. */
-private class BugReport(val screenshot: ImageBitmap)

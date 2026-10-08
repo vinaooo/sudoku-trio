@@ -9,13 +9,13 @@ Sudoku for Android — Classic, Sudoku X and Killer, four difficulties each. Kot
 | Module | Responsibility |
 |---|---|
 | `:domain` | Pure Kotlin game rules, scoring, use cases, repository interfaces |
-| `:data` | Room (scores/stats), DataStore (settings), saved game serialization |
-| `:core:designsystem` | `SudokuTrioTheme` (dynamic color, light/dark, expressive motion) |
+| `:data` | vinkit's scores database, DataStore (settings), saved game serialization |
+| `:core:designsystem` | `SudokuTrioTheme` (vinkit's theme plus the board's colors) |
 | `:core:ui` | Shared UI helpers |
-| `:core:ads` | AdMob banner and consent (UMP) behind `AdBannerProvider` / `AdConsent` |
 | `:feature:game` / `:feature:scores` / `:feature:settings` | Screens + ViewModels |
 | `:app` | Application, navigation, app scaffold with the bottom banner |
-| `build-logic` | Gradle convention plugins |
+
+The build (convention plugins, version catalog, quality gates) and the shared pieces (theme, ads, settings and scores screens, bug report, game frame and toolbar) come from [vinkit](https://github.com/vinaooo/vinkit) through JitPack; `vinkit.tag` in `gradle.properties` picks its release.
 
 ## Requirements
 
@@ -72,22 +72,22 @@ Signing keys and ad unit IDs live in `local.properties` / GitHub Secrets and are
 To sign release builds, keep the upload keystore outside the repository (and backed up) and add to `local.properties`:
 
 ```properties
-sudokutrio.signing.storeFile=/path/to/sudokutrio-upload.jks
-sudokutrio.signing.storePassword=…
-sudokutrio.signing.keyAlias=sudokutrio-upload
-sudokutrio.signing.keyPassword=…
+vinkit.signing.storeFile=/path/to/sudokutrio-upload.jks
+vinkit.signing.storePassword=…
+vinkit.signing.keyAlias=sudokutrio-upload
+vinkit.signing.keyPassword=…
 ```
 
-On CI, set the same values as the `SUDOKUTRIO_SIGNING_STORE_FILE`, `SUDOKUTRIO_SIGNING_STORE_PASSWORD`, `SUDOKUTRIO_SIGNING_KEY_ALIAS` and `SUDOKUTRIO_SIGNING_KEY_PASSWORD` environment variables. Without them, `./gradlew :app:assembleRelease` builds an unsigned APK.
+On CI, set the same values as the `VINKIT_SIGNING_STORE_FILE`, `VINKIT_SIGNING_STORE_PASSWORD`, `VINKIT_SIGNING_KEY_ALIAS` and `VINKIT_SIGNING_KEY_PASSWORD` environment variables. Without them, `./gradlew :app:assembleRelease` builds an unsigned APK.
 
 ### Ads
 
-Debug builds always show Google's test ads. For release builds, add your AdMob IDs to `local.properties` (or set `SUDOKUTRIO_ADS_APP_ID` / `SUDOKUTRIO_ADS_BANNER_ID` on CI); without them, release builds show test ads too:
+Debug builds always show Google's test ads. For release builds, add your AdMob IDs to `local.properties` (or set `VINKIT_ADS_APP_ID` / `VINKIT_ADS_BANNER_ID` on CI); without them, release builds show test ads too:
 
 ```properties
-sudokutrio.ads.appId=ca-app-pub-…~…        # the app ID, with a ~
-sudokutrio.ads.bannerId=ca-app-pub-…/…     # the banner ad unit ID, with a /
-sudokutrio.ads.testDeviceIds=…             # optional: hashed IDs of your own devices (from logcat), which always get test ads
+vinkit.ads.appId=ca-app-pub-…~…        # the app ID, with a ~
+vinkit.ads.bannerId=ca-app-pub-…/…     # the banner ad unit ID, with a /
+vinkit.ads.testDeviceIds=…             # optional: hashed IDs of your own devices (from logcat), which always get test ads
 ```
 
 ### Releasing to Google Play
@@ -107,9 +107,9 @@ To turn it on:
 
 | Secret | Value |
 |---|---|
-| `SUDOKUTRIO_UPLOAD_KEYSTORE_BASE64` | `base64 -w0 /path/to/sudokutrio-upload.jks` |
-| `SUDOKUTRIO_SIGNING_STORE_PASSWORD`, `SUDOKUTRIO_SIGNING_KEY_ALIAS`, `SUDOKUTRIO_SIGNING_KEY_PASSWORD` | same as in `local.properties` |
-| `SUDOKUTRIO_ADS_APP_ID`, `SUDOKUTRIO_ADS_BANNER_ID` | the AdMob IDs |
+| `VINKIT_UPLOAD_KEYSTORE_BASE64` | `base64 -w0 /path/to/sudokutrio-upload.jks` |
+| `VINKIT_SIGNING_STORE_PASSWORD`, `VINKIT_SIGNING_KEY_ALIAS`, `VINKIT_SIGNING_KEY_PASSWORD` | same as in `local.properties` |
+| `VINKIT_ADS_APP_ID`, `VINKIT_ADS_BANNER_ID` | the AdMob IDs |
 | `PLAY_SERVICE_ACCOUNT_JSON` | the whole JSON key file |
 
 5. **Add the repository variable** `PLAY_UPLOAD_ENABLED` = `true` (same page, Variables tab).

@@ -1,5 +1,6 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
+import io.github.vinaooo.sudokutrio.domain.fake.FakeAppSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeScoreRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSettingsRepository
@@ -7,12 +8,12 @@ import io.github.vinaooo.sudokutrio.domain.fake.FakeStatsRepository
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
 import io.github.vinaooo.sudokutrio.domain.model.Hint
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.key
 import io.github.vinaooo.sudokutrio.domain.rules.ConflictFinder
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
@@ -23,6 +24,9 @@ import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.shell.FeedbackEvent
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -50,6 +54,7 @@ class GameViewModelTest {
     private val stats = FakeStatsRepository()
     private val scores = FakeScoreRepository()
     private val settings = FakeSettingsRepository()
+    private val appSettings = FakeAppSettingsRepository()
     private val feedback = FakeGameFeedback()
     private val engine = GameEngine()
 
@@ -99,6 +104,7 @@ class GameViewModelTest {
             saveGame = SaveGame(savedGames),
             finishGame = FinishGame(scores, stats, savedGames) { 5_000L },
             settingsRepository = settings,
+            appSettingsRepository = appSettings,
             engine = engine,
             conflicts = ConflictFinder(),
             feedback = feedback,
@@ -181,7 +187,7 @@ class GameViewModelTest {
 
     @Test
     fun `sound and vibration follow the settings`() = gameTest {
-        settings.settings.value = Settings(soundEnabled = false)
+        appSettings.current.value = AppSettings(soundEnabled = false)
         val vm = viewModel()
         play(vm, GameIntent.SelectCell(0), GameIntent.Digit(2))
         feedback.sounds shouldBe emptyList()
@@ -268,7 +274,7 @@ class GameViewModelTest {
         vm.session.state.isWon shouldBe true
         vm.state.winRecord.shouldNotBeNull().points shouldBe vm.session.state.score
         scores.records.value.size shouldBe 1
-        stats.observe(classic).first() shouldBe GameStats(played = 1, won = 1, currentStreak = 1, bestStreak = 1)
+        stats.observe(classic.key).first() shouldBe GameStats(played = 1, won = 1, currentStreak = 1, bestStreak = 1)
         savedGames.saved.shouldBeNull()
         feedback.sounds shouldContainExactly listOf(FeedbackEvent.WIN)
         play(vm, GameIntent.Undo, GameIntent.Pause)
@@ -285,7 +291,7 @@ class GameViewModelTest {
         vm.session shouldNotBe before
         vm.session.state.moves shouldBe 0
         vm.state.selected.shouldBeNull()
-        stats.observe(classic).first().played shouldBe 1
+        stats.observe(classic.key).first().played shouldBe 1
     }
 
     @Test
@@ -329,7 +335,7 @@ class GameViewModelTest {
         // The classic puzzle prepared before isn't used: one in the new mode is made, and the next one prepared.
         generated shouldBe
             listOf(classic, classic, GameMode(Variant.X, Difficulty.MEDIUM), GameMode(Variant.X, Difficulty.MEDIUM))
-        settings.update { it.copy(soundEnabled = false) }
+        appSettings.update { it.copy(soundEnabled = false) }
         runCurrent()
         generated.size shouldBe 4
     }

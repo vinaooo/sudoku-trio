@@ -7,14 +7,18 @@ import io.github.vinaooo.sudokutrio.domain.fake.FakeStatsRepository
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.mode
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
 import io.github.vinaooo.sudokutrio.domain.model.Move
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.hintsUsed
+import io.github.vinaooo.sudokutrio.domain.model.key
+import io.github.vinaooo.sudokutrio.domain.model.mistakes
+import io.github.vinaooo.sudokutrio.domain.model.ranking
 import io.github.vinaooo.sudokutrio.domain.newState
 import io.github.vinaooo.sudokutrio.domain.puzzle
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
+import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.core.ScoreRecord
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -55,9 +59,9 @@ class GameUseCasesTest {
     fun `a new game counts an unfinished one as a loss in its own mode`() = runTest {
         saved.saved = inProgress()
         StartNewGame(abandon, saved, generator, { 1L }, engine, StandardTestDispatcher(testScheduler))(mode())
-        stats.observe(mode(Variant.X)).first() shouldBe GameStats(played = 1)
-        stats.observe(mode()).first() shouldBe GameStats()
-        ObservePlayedModes(stats)().first() shouldBe setOf(mode(Variant.X))
+        stats.observe(mode(Variant.X).key).first() shouldBe GameStats(played = 1)
+        stats.observe(mode().key).first() shouldBe GameStats()
+        stats.observePlayedModes().first() shouldBe setOf(mode(Variant.X).key)
     }
 
     @Test
@@ -78,7 +82,7 @@ class GameUseCasesTest {
         restarted.seed shouldBe session.seed
         restarted.state shouldBe engine.newGame(session.state.puzzle, session.state.mode)
         saved.saved shouldBe restarted
-        stats.observe(session.state.mode).first().played shouldBe 1
+        stats.observe(session.state.mode.key).first().played shouldBe 1
     }
 
     @Test
@@ -97,13 +101,14 @@ class GameUseCasesTest {
             .tick(30, engine).play(Move.Place(0, SOLUTION[0]), engine).shouldNotBeNull()
         saved.saved = won
         val record = FinishGame(scores, stats, saved) { 1234L }(won)
-        record shouldBe ScoreRecord(mode(), won.state.score, 30, 2, 1, 1234)
+        record shouldBe ScoreRecord(mode().key, won.state.score, 30, 1234, mapOf("mistakes" to "2", "hints" to "1"))
+        record.mistakes shouldBe 2
+        record.hintsUsed shouldBe 1
         scores.records.value shouldBe listOf(record)
-        stats.observe(mode()).first() shouldBe GameStats(played = 1, won = 1, currentStreak = 1, bestStreak = 1)
+        stats.observe(mode().key).first() shouldBe GameStats(played = 1, won = 1, currentStreak = 1, bestStreak = 1)
         saved.saved.shouldBeNull()
-        ObserveTopScores(scores)(mode()).first() shouldBe listOf(record)
-        ObservePlayedModes(stats)().first() shouldBe setOf(mode())
-        ObserveStats(stats)(mode()).first().won shouldBe 1
+        scores.observeTopScores(mode().key, mode().ranking()).first() shouldBe listOf(record)
+        stats.observePlayedModes().first() shouldBe setOf(mode().key)
     }
 
     @Test
@@ -128,7 +133,7 @@ class GameUseCasesTest {
         session.seed shouldBe 55L
         session.state.puzzle shouldBe prepared.puzzle
         generated shouldBe emptyList()
-        stats.observe(mode(Variant.X)).first().played shouldBe 1
+        stats.observe(mode(Variant.X).key).first().played shouldBe 1
         saved.saved shouldBe session
     }
 

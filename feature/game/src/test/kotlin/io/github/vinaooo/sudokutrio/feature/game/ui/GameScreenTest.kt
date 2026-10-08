@@ -15,12 +15,13 @@ import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.key
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.GameUiState
+import io.github.vinaooo.vinkit.core.ScoreRecord
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.Rule
 import org.junit.Test
@@ -119,7 +120,20 @@ class GameScreenTest {
 
     @Test
     fun `the win shows the score, time, mistakes and hints`() {
-        show(ready().copy(winRecord = ScoreRecord(session.state.mode, 795, 65, 2, 1, 0)))
+        show(
+            ready().copy(
+                winRecord = ScoreRecord(
+                    session.state.mode.key,
+                    795,
+                    65,
+                    0,
+                    mapOf(
+                        "mistakes" to "2",
+                        "hints" to "1",
+                    ),
+                ),
+            ),
+        )
         compose.onNodeWithText("You won!").assertExists()
         compose.onNodeWithText("Score: 795").assertExists()
         compose.onNodeWithText("Time: 1:05").assertExists()

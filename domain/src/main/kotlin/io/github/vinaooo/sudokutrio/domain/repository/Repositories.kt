@@ -1,8 +1,5 @@
 package io.github.vinaooo.sudokutrio.domain.repository
 
-import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import kotlinx.coroutines.flow.Flow
@@ -13,23 +10,6 @@ interface SavedGameRepository {
     suspend fun save(session: GameSession)
 
     suspend fun clear()
-}
-
-interface ScoreRepository {
-    /** The best [limit] scores of [mode], in its ranking order ([ScoreRecord.rankingFor]). */
-    fun observeTopScores(mode: GameMode, limit: Int = ScoreRecord.TOP_LIMIT): Flow<List<ScoreRecord>>
-
-    suspend fun add(record: ScoreRecord)
-}
-
-/** Statistics are kept per mode. */
-interface StatsRepository {
-    fun observe(mode: GameMode): Flow<GameStats>
-
-    /** The modes played at least once, won or not: the Scores screen's tabs. */
-    fun observePlayedModes(): Flow<Set<GameMode>>
-
-    suspend fun update(mode: GameMode, transform: (GameStats) -> GameStats)
 }
 
 interface SettingsRepository {

@@ -4,6 +4,8 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.designsystem.paletteScheme
 
 /**
  * The board's colors, all from the theme's roles so every palette and dynamic color work.
@@ -52,4 +54,4 @@ internal fun boardColorsFor(scheme: ColorScheme) = BoardColors(
     selectionBorder = scheme.primary,
 )
 
-val LocalBoardColors = staticCompositionLocalOf { boardColorsFor(BlueColors.light) }
+val LocalBoardColors = staticCompositionLocalOf { boardColorsFor(paletteScheme(ThemeColor.BLUE, dark = false)) }

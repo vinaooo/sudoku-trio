@@ -1,12 +1,15 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.ScoreRecord
 
 data class GameUiState(
     val session: GameSession? = null,
     val settings: Settings = Settings(),
+    /** The settings every vinkit game has: feedback, hand, board position, phone view. */
+    val appSettings: AppSettings = AppSettings(),
     /** A puzzle is being generated: the board, pad and toolbar wait, and the clock stops. */
     val loading: Boolean = true,
     val selected: Int? = null,
@@ -40,7 +43,6 @@ sealed interface GameIntent {
     data object Restart : GameIntent
 
     /** Handled by the screen, which captures the board first. */
-    data object ReportBug : GameIntent
 
     /** The screen became visible: the clock may run. */
     data object Resume : GameIntent

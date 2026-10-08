@@ -17,6 +17,11 @@ import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
+import io.github.vinaooo.vinkit.core.AppSettingsRepository
+import io.github.vinaooo.vinkit.shell.FeedbackEvent
+import io.github.vinaooo.vinkit.shell.GameFeedback
+import io.github.vinaooo.vinkit.shell.Ticker
+import io.github.vinaooo.vinkit.shell.give
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
@@ -43,6 +48,7 @@ class GameViewModel @Inject constructor(
     private val saveGame: SaveGame,
     private val finishGame: FinishGame,
     private val settingsRepository: SettingsRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val engine: GameEngine,
     private val conflicts: ConflictFinder,
     private val feedback: GameFeedback,
@@ -69,6 +75,9 @@ class GameViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settingsRepository.settings.collect { settings -> state.update { it.copy(settings = settings) } }
+        }
+        viewModelScope.launch {
+            appSettingsRepository.settings.collect { settings -> state.update { it.copy(appSettings = settings) } }
         }
         generation = viewModelScope.launch {
             val resumed = resumeGame()
@@ -97,7 +106,6 @@ class GameViewModel @Inject constructor(
             GameIntent.Restart -> restart()
             GameIntent.Resume -> clock.start()
             GameIntent.Pause -> pause()
-            GameIntent.ReportBug -> Unit
         }
     }
 
@@ -110,7 +118,7 @@ class GameViewModel @Inject constructor(
         val session = playable() ?: return
         val next = session.play(move, engine)
         if (next == null) {
-            feedback.give(FeedbackEvent.REJECTED, state.value.settings)
+            feedback.give(FeedbackEvent.REJECTED, state.value.appSettings)
             return
         }
         onPlayed(next)
@@ -125,13 +133,13 @@ class GameViewModel @Inject constructor(
         hintSearch?.cancel()
         show(next)
         if (next.state.isWon) {
-            feedback.give(FeedbackEvent.WIN, state.value.settings)
+            feedback.give(FeedbackEvent.WIN, state.value.appSettings)
             viewModelScope.launch {
                 val record = finishGame(next)
                 state.update { it.copy(winRecord = record) }
             }
         } else {
-            feedback.give(FeedbackEvent.MOVE, state.value.settings)
+            feedback.give(FeedbackEvent.MOVE, state.value.appSettings)
             viewModelScope.launch { saveGame(next) }
         }
     }

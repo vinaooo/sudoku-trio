@@ -3,15 +3,13 @@ package io.github.vinaooo.sudokutrio.data.settings
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.Handedness
-import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.ThemeMode
+import io.github.vinaooo.vinkit.settings.DataStoreAppSettingsRepository
 import io.kotest.matchers.shouldBe
 import java.io.File
 import kotlinx.coroutines.flow.first
@@ -39,19 +37,8 @@ class DataStoreSettingsRepositoryTest {
     }
 
     @Test
-    fun `every setting is persisted`() = scope.runTest {
-        val changed = Settings(
-            mode = GameMode(Variant.KILLER, Difficulty.EXPERT),
-            themeMode = ThemeMode.DARK,
-            dynamicColor = false,
-            themeColor = ThemeColor.PURPLE,
-            soundEnabled = false,
-            hapticsEnabled = false,
-            handedness = Handedness.LEFT,
-            boardAlignment = BoardAlignment.BOTTOM,
-            phoneView = true,
-            phoneViewSide = PhoneViewSide.LEFT,
-        )
+    fun `the next game's mode is persisted`() = scope.runTest {
+        val changed = Settings(mode = GameMode(Variant.KILLER, Difficulty.EXPERT))
         repository().update { changed }
 
         repository().settings.first() shouldBe changed
@@ -60,10 +47,19 @@ class DataStoreSettingsRepositoryTest {
     @Test
     fun `updates transform the current value`() = scope.runTest {
         val repository = repository()
-        repository.update { it.copy(themeMode = ThemeMode.LIGHT) }
-        repository.update { it.copy(soundEnabled = false) }
+        repository.update { it.copy(mode = it.mode.copy(variant = Variant.X)) }
+        repository.update { it.copy(mode = it.mode.copy(difficulty = Difficulty.HARD)) }
 
-        repository.settings.first() shouldBe Settings(themeMode = ThemeMode.LIGHT, soundEnabled = false)
+        repository.settings.first() shouldBe Settings(GameMode(Variant.X, Difficulty.HARD))
+    }
+
+    @Test
+    fun `vinkit's common settings in the same DataStore leave the mode alone`() = scope.runTest {
+        val repository = repository()
+        repository.update { it.copy(mode = GameMode(Variant.KILLER, Difficulty.MEDIUM)) }
+        DataStoreAppSettingsRepository(store, AppSettings()).update { it.copy(themeMode = ThemeMode.DARK) }
+
+        repository.settings.first().mode shouldBe GameMode(Variant.KILLER, Difficulty.MEDIUM)
     }
 
     @Test

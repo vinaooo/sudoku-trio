@@ -13,8 +13,9 @@ import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.repository.SavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
-import io.github.vinaooo.sudokutrio.domain.session.GameCodec
+import io.github.vinaooo.sudokutrio.domain.session.BoardCodec
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
+import io.github.vinaooo.sudokutrio.domain.session.decodeSession
 import io.github.vinaooo.sudokutrio.domain.solver.Candidates
 import io.github.vinaooo.sudokutrio.domain.solver.Deduction
 import io.github.vinaooo.sudokutrio.domain.solver.HiddenSingle
@@ -50,9 +51,9 @@ class DebugGameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         runBlocking {
-            val report = intent.getStringExtra("state")?.let { GameSession(seed = 0, state = GameCodec.decode(it)) }
+            val report = intent.getStringExtra("state")?.let { GameSession(seed = 0, state = BoardCodec.decode(it)) }
                 ?: intent.getStringExtra("load")?.let {
-                    GameCodec.decodeSession(File(getExternalFilesDir(null), it).readText())
+                    decodeSession(File(getExternalFilesDir(null), it).readText())
                 }
             savedGames.save(report ?: preset(intent.getStringExtra("game")))
         }

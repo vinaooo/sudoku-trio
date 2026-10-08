@@ -2,7 +2,8 @@ package io.github.vinaooo.sudokutrio.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.designsystem.paletteScheme
 import io.kotest.assertions.withClue
 import io.kotest.matchers.doubles.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldNotBe

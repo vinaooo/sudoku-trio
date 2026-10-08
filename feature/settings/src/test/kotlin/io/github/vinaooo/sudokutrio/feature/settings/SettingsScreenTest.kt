@@ -6,14 +6,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
-import io.github.vinaooo.sudokutrio.domain.model.Handedness
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.BoardAlignment
+import io.github.vinaooo.vinkit.core.Handedness
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,19 +29,29 @@ class SettingsScreenTest {
     val compose = createComposeRule()
 
     private val changes = mutableListOf<SettingsChange>()
+    private var app = AppSettings()
 
-    private fun show(settings: Settings = Settings(), privacyOptions: Boolean = false, onPolicy: () -> Unit = {}) =
+    private fun show(
+        settings: Settings = Settings(),
+        appSettings: AppSettings = AppSettings(),
+        privacyOptions: Boolean = false,
+        onPolicy: () -> Unit = {},
+    ) {
+        app = appSettings
         compose.setContent {
             SudokuTrioTheme {
                 SettingsScreen(
                     settings,
+                    appSettings,
                     { changes += it },
+                    { app = it(app) },
                     onBack = {},
                     privacyOptionsRequired = privacyOptions,
                     onOpenPrivacyPolicy = onPolicy,
                 )
             }
         }
+    }
 
     @Test
     fun `the game section picks the variant and the difficulty`() {
@@ -59,25 +71,27 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun `appearance and feedback rows send their changes`() {
-        show(Settings(dynamicColor = false))
+    fun `appearance and feedback rows change vinkit's settings`() {
+        show(appSettings = AppSettings(dynamicColor = false))
         compose.onNodeWithText("Dark").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Orange").performScrollTo().performClick()
         compose.onNodeWithText("Left").performScrollTo().performClick()
         compose.onNodeWithText("Bottom").performScrollTo().performClick()
         compose.onNodeWithText("Vibration").performScrollTo().performClick()
-        changes shouldContainExactly listOf(
-            SettingsChange.ThemeModeChanged(ThemeMode.DARK),
-            SettingsChange.ThemeColorChanged(ThemeColor.ORANGE),
-            SettingsChange.HandednessChanged(Handedness.LEFT),
-            SettingsChange.BoardAlignmentChanged(BoardAlignment.BOTTOM),
-            SettingsChange.HapticsChanged(false),
+        app shouldBe AppSettings(
+            themeMode = ThemeMode.DARK,
+            dynamicColor = false,
+            themeColor = ThemeColor.ORANGE,
+            hapticsEnabled = false,
+            handedness = Handedness.LEFT,
+            boardAlignment = BoardAlignment.BOTTOM,
         )
+        changes shouldBe emptyList()
     }
 
     @Test
     fun `the color row hides while dynamic color is on`() {
-        show(Settings(dynamicColor = true))
+        show(appSettings = AppSettings(dynamicColor = true))
         compose.onNodeWithContentDescription("Orange").assertDoesNotExist()
     }
 
@@ -93,7 +107,7 @@ class SettingsScreenTest {
     @Test
     @Config(qualifiers = "sw600dp-w800dp-h1280dp-port")
     fun `a tablet offers phone view and, once on, its side`() {
-        show(Settings(phoneView = true))
+        show(appSettings = AppSettings(phoneView = true))
         compose.onNodeWithText("Phone view").assertExists()
         compose.onNodeWithText("Board side").assertExists()
     }

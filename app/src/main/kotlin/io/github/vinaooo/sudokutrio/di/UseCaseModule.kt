@@ -7,20 +7,17 @@ import dagger.hilt.components.SingletonComponent
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.repository.Clock
 import io.github.vinaooo.sudokutrio.domain.repository.SavedGameRepository
-import io.github.vinaooo.sudokutrio.domain.repository.ScoreRepository
 import io.github.vinaooo.sudokutrio.domain.repository.SeedSource
-import io.github.vinaooo.sudokutrio.domain.repository.StatsRepository
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.usecase.AbandonGame
 import io.github.vinaooo.sudokutrio.domain.usecase.FinishGame
-import io.github.vinaooo.sudokutrio.domain.usecase.ObservePlayedModes
-import io.github.vinaooo.sudokutrio.domain.usecase.ObserveStats
-import io.github.vinaooo.sudokutrio.domain.usecase.ObserveTopScores
 import io.github.vinaooo.sudokutrio.domain.usecase.PreparePuzzle
 import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
+import io.github.vinaooo.vinkit.core.ScoreRepository
+import io.github.vinaooo.vinkit.core.StatsRepository
 import kotlinx.coroutines.Dispatchers
 
 /** Domain use cases, wired to the data layer's repositories. */
@@ -54,10 +51,4 @@ object UseCaseModule {
     @Provides
     fun finishGame(scores: ScoreRepository, stats: StatsRepository, savedGames: SavedGameRepository, clock: Clock) =
         FinishGame(scores, stats, savedGames, clock)
-
-    @Provides fun observeTopScores(scores: ScoreRepository) = ObserveTopScores(scores)
-
-    @Provides fun observePlayedModes(stats: StatsRepository) = ObservePlayedModes(stats)
-
-    @Provides fun observeStats(stats: StatsRepository) = ObserveStats(stats)
 }

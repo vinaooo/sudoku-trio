@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.sudokutrio.android.library)
-    alias(libs.plugins.sudokutrio.android.compose)
+    alias(libs.plugins.vinkit.android.library)
+    alias(libs.plugins.vinkit.android.compose)
 }
 
 android {
@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
+    api("com.github.vinaooo.vinkit:designsystem:${providers.gradleProperty("vinkit.tag").get()}")
 }
