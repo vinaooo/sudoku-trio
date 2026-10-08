@@ -1,5 +1,4 @@
 <resources>
-    <string name="time">Tempo</string>
     <string name="undo">Desfazer</string>
     <string name="redo">Refazer</string>
     <string name="hint">Dica</string>
@@ -9,11 +8,7 @@
     <string name="digit_complete">%1$d, todos colocados</string>
     <string name="new_game">Novo jogo</string>
     <string name="restart_board">Recomeçar este tabuleiro</string>
-    <string name="close_menu">Fechar menu</string>
-    <string name="open_scores">Pontuações</string>
-    <string name="open_settings">Configurações</string>
     <string name="generating">Criando um novo quebra-cabeça</string>
-    <string name="you_won">Você venceu!</string>
     <string name="win_score">Pontuação: %1$d</string>
     <string name="win_time">Tempo: %1$s</string>
     <string name="win_mistakes">Erros: %1$d</string>
@@ -50,5 +45,4 @@
     <string name="a11y_undone">Jogada desfeita</string>
     <string name="a11y_redone">Jogada refeita</string>
     <!-- Relatar bug -->
-    <string name="report_bug">Relatar um bug</string>
 </resources>

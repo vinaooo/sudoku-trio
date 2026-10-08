@@ -43,7 +43,6 @@ sealed interface GameIntent {
     data object Restart : GameIntent
 
     /** Handled by the screen, which captures the board first. */
-    data object ReportBug : GameIntent
 
     /** The screen became visible: the clock may run. */
     data object Resume : GameIntent

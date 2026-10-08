@@ -106,7 +106,6 @@ class GameViewModel @Inject constructor(
             GameIntent.Restart -> restart()
             GameIntent.Resume -> clock.start()
             GameIntent.Pause -> pause()
-            GameIntent.ReportBug -> Unit
         }
     }
 
