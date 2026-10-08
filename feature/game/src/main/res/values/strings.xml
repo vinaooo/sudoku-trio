@@ -51,10 +51,4 @@
     <string name="a11y_redone">Move redone</string>
     <!-- Bug report -->
     <string name="report_bug">Report a bug</string>
-    <string name="report_bug_body">Tell us what happened. Sending by email attaches a screenshot of the board and the game, so we can replay it.</string>
-    <string name="report_bug_hint">What went wrong?</string>
-    <string name="report_by_email">Email</string>
-    <string name="report_on_github">GitHub</string>
-    <string name="report_cancel">Cancel</string>
-    <string name="report_subject">Sudoku Trio bug report</string>
 </resources>

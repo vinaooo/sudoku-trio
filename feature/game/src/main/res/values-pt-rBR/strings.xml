@@ -51,10 +51,4 @@
     <string name="a11y_redone">Jogada refeita</string>
     <!-- Relatar bug -->
     <string name="report_bug">Relatar um bug</string>
-    <string name="report_bug_body">Conte o que aconteceu. Enviar por e-mail anexa uma captura do tabuleiro e o jogo, para podermos reproduzi-lo.</string>
-    <string name="report_bug_hint">O que deu errado?</string>
-    <string name="report_by_email">E-mail</string>
-    <string name="report_on_github">GitHub</string>
-    <string name="report_cancel">Cancelar</string>
-    <string name="report_subject">Relatório de bug do Sudoku Trio</string>
 </resources>

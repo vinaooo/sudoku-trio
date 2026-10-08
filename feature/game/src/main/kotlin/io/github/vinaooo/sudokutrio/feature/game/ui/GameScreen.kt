@@ -37,8 +37,11 @@ import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.GameUiState
 import io.github.vinaooo.sudokutrio.feature.game.GameViewModel
 import io.github.vinaooo.sudokutrio.feature.game.R
+import io.github.vinaooo.sudokutrio.feature.game.SudokuTrioReports
 import io.github.vinaooo.sudokutrio.feature.game.board.CellHighlighter
 import io.github.vinaooo.sudokutrio.feature.game.board.SudokuBoard
+import io.github.vinaooo.sudokutrio.feature.game.gameReport
+import io.github.vinaooo.vinkit.bugreport.BugReportDialog
 import io.github.vinaooo.vinkit.core.BoardAlignment
 import io.github.vinaooo.vinkit.core.Handedness
 import io.github.vinaooo.vinkit.core.PhoneViewSide
@@ -104,7 +107,11 @@ fun GameScreen(
         }
     }
     uiState.winRecord?.let { WinDialog(it, onNewGame = { onIntent(GameIntent.NewGame) }) }
-    report?.let { BugReportDialog(uiState, it.screenshot, onDone = { report = null }) }
+    report?.let {
+        BugReportDialog(SudokuTrioReports, it.screenshot, onDone = { report = null }) {
+            gameReport(uiState.settings, uiState.session)
+        }
+    }
 }
 
 /**
