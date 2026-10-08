@@ -1,4 +1,6 @@
 package io.github.vinaooo.sudokutrio.feature.game
+import io.github.vinaooo.vinkit.shell.FeedbackEvent
+import io.github.vinaooo.vinkit.shell.GameFeedback
 
 class FakeGameFeedback : GameFeedback {
     val sounds = mutableListOf<FeedbackEvent>()

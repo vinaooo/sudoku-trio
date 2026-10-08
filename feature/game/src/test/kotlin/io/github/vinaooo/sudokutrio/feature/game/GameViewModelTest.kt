@@ -26,6 +26,7 @@ import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
 import io.github.vinaooo.vinkit.core.AppSettings
 import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.shell.FeedbackEvent
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
