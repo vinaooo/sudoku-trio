@@ -109,7 +109,7 @@ fun GameScreen(
     uiState.winRecord?.let { WinDialog(it, onNewGame = { onIntent(GameIntent.NewGame) }) }
     report?.let {
         BugReportDialog(SudokuTrioReports, it.screenshot, onDone = { report = null }) {
-            gameReport(uiState.settings, uiState.session)
+            gameReport(uiState.settings, uiState.appSettings, uiState.session)
         }
     }
 }
@@ -127,7 +127,7 @@ private fun GameContent(
     onOpenScores: (() -> Unit)?,
     onOpenSettings: (() -> Unit)?,
 ) {
-    val settings = uiState.settings
+    val settings = uiState.appSettings
     val layout = BoardLayout(
         alignment = settings.boardAlignment,
         phoneView = settings.phoneView && LocalConfiguration.current.smallestScreenWidthDp >= TABLET_WIDTH_DP,

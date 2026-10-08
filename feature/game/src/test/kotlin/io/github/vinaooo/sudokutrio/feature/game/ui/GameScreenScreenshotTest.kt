@@ -9,12 +9,12 @@ import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
-import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.rules.ConflictFinder
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.feature.game.GameUiState
+import io.github.vinaooo.vinkit.core.AppSettings
 import io.github.vinaooo.vinkit.core.BoardAlignment
 import io.github.vinaooo.vinkit.core.Handedness
 import io.github.vinaooo.vinkit.core.PhoneViewSide
@@ -59,15 +59,19 @@ class GameScreenScreenshotTest {
         compose.onRoot().captureRoboImage("src/test/screenshots/$name.png")
     }
 
-    private fun ui(session: GameSession, selected: Int?, notesMode: Boolean = false, settings: Settings = Settings()) =
-        GameUiState(
-            settings = settings,
-            session = session,
-            loading = false,
-            selected = selected,
-            notesMode = notesMode,
-            conflicts = ConflictFinder().conflicts(session.state),
-        )
+    private fun ui(
+        session: GameSession,
+        selected: Int?,
+        notesMode: Boolean = false,
+        settings: AppSettings = AppSettings(),
+    ) = GameUiState(
+        appSettings = settings,
+        session = session,
+        loading = false,
+        selected = selected,
+        notesMode = notesMode,
+        conflicts = ConflictFinder().conflicts(session.state),
+    )
 
     @Test
     fun classic_light_playing() {
@@ -111,7 +115,7 @@ class GameScreenScreenshotTest {
 
     @Test
     fun classic_light_left_hand_bottom_board() {
-        val left = Settings(handedness = Handedness.LEFT, boardAlignment = BoardAlignment.BOTTOM)
+        val left = AppSettings(handedness = Handedness.LEFT, boardAlignment = BoardAlignment.BOTTOM)
         capture(
             "classic_light_left_hand_bottom_board",
             ui(
@@ -130,14 +134,14 @@ class GameScreenScreenshotTest {
         val hinted = session(Variant.KILLER) { it < 9 || it % 3 == 0 }.then(Move.RevealHint)
         capture(
             "killer_light_landscape_left_hand_hint",
-            ui(hinted, selected = null, settings = Settings(handedness = Handedness.LEFT)),
+            ui(hinted, selected = null, settings = AppSettings(handedness = Handedness.LEFT)),
         )
     }
 
     @Test
     @Config(qualifiers = "sw800dp-w800dp-h1280dp-port-xhdpi")
     fun tablet_phone_view_left() {
-        val tablet = Settings(phoneView = true, phoneViewSide = PhoneViewSide.LEFT)
+        val tablet = AppSettings(phoneView = true, phoneViewSide = PhoneViewSide.LEFT)
         capture("tablet_phone_view_left", ui(session(Variant.X) { it % 3 == 0 }, 40, settings = tablet))
     }
 

@@ -8,11 +8,8 @@ import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.repository.SettingsRepository
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
-import io.github.vinaooo.vinkit.core.BoardAlignment
-import io.github.vinaooo.vinkit.core.Handedness
-import io.github.vinaooo.vinkit.core.PhoneViewSide
-import io.github.vinaooo.vinkit.core.ThemeColor
-import io.github.vinaooo.vinkit.core.ThemeMode
+import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.AppSettingsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/** A change to Sudoku Trio's own settings: a new mode starts a new game, after a confirmation if one is in progress. */
 sealed interface SettingsChange {
     fun applyTo(settings: Settings): Settings
 
@@ -31,52 +29,20 @@ sealed interface SettingsChange {
     data class DifficultyChanged(val value: Difficulty) : SettingsChange {
         override fun applyTo(settings: Settings) = settings.copy(mode = settings.mode.copy(difficulty = value))
     }
-
-    data class ThemeModeChanged(val value: ThemeMode) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(themeMode = value)
-    }
-
-    data class DynamicColorChanged(val value: Boolean) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(dynamicColor = value)
-    }
-
-    data class ThemeColorChanged(val value: ThemeColor) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(themeColor = value)
-    }
-
-    data class SoundChanged(val value: Boolean) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(soundEnabled = value)
-    }
-
-    data class HapticsChanged(val value: Boolean) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(hapticsEnabled = value)
-    }
-
-    data class HandednessChanged(val value: Handedness) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(handedness = value)
-    }
-
-    data class BoardAlignmentChanged(val value: BoardAlignment) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(boardAlignment = value)
-    }
-
-    data class PhoneViewChanged(val value: Boolean) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(phoneView = value)
-    }
-
-    data class PhoneViewSideChanged(val value: PhoneViewSide) : SettingsChange {
-        override fun applyTo(settings: Settings) = settings.copy(phoneViewSide = value)
-    }
 }
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: SettingsRepository,
+    private val appRepository: AppSettingsRepository,
     private val resumeGame: ResumeGame,
 ) : ViewModel() {
 
     val settings: StateFlow<Settings> = repository.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), Settings())
+
+    val appSettings: StateFlow<AppSettings> = appRepository.settings
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), AppSettings())
 
     private val pending = MutableStateFlow<SettingsChange?>(null)
 
@@ -94,6 +60,10 @@ class SettingsViewModel @Inject constructor(
                 repository.update(change::applyTo)
             }
         }
+    }
+
+    fun onAppChange(transform: (AppSettings) -> AppSettings) {
+        viewModelScope.launch { appRepository.update(transform) }
     }
 
     fun confirmChange() {

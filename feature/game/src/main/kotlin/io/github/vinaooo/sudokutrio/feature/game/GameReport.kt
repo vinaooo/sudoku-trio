@@ -5,18 +5,18 @@ import io.github.vinaooo.sudokutrio.domain.session.BoardCodec
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.vinkit.bugreport.GameReport
 import io.github.vinaooo.vinkit.bugreport.ReportTarget
+import io.github.vinaooo.vinkit.core.AppSettings
 import kotlinx.serialization.json.Json
 
 /** Where Sudoku Trio's bug reports go: the contact in the privacy policy, chosen with the user, and the repository. */
 internal val SudokuTrioReports = ReportTarget("vrpedrinho+trio@gmail.com", "vinaooo/sudoku-trio")
 
 /** What a bug report says about the game: its settings and, with a game, the game, its exact board and its file. */
-internal fun gameReport(settings: Settings, session: GameSession?): GameReport = GameReport(
+internal fun gameReport(settings: Settings, app: AppSettings, session: GameSession?): GameReport = GameReport(
     details = listOfNotNull(
-        with(settings) {
-            "Settings: ${mode.variant} ${mode.difficulty}, $handedness hand, board $boardAlignment, " +
-                "theme $themeMode, dynamic color $dynamicColor, phone view $phoneView"
-        },
+        "Settings: ${settings.mode.variant} ${settings.mode.difficulty}, ${app.handedness} hand, " +
+            "board ${app.boardAlignment}, theme ${app.themeMode}, dynamic color ${app.dynamicColor}, " +
+            "phone view ${app.phoneView}",
         session?.run {
             with(state) {
                 "Game: seed $seed, ${mode.variant} ${mode.difficulty}, $moves moves, $mistakes mistakes, " +

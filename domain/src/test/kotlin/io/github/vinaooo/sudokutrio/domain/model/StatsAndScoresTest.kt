@@ -1,8 +1,6 @@
 package io.github.vinaooo.sudokutrio.domain.model
 
 import io.github.vinaooo.sudokutrio.domain.mode
-import io.github.vinaooo.vinkit.core.ThemeColor
-import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -26,11 +24,7 @@ class StatsAndScoresTest {
     }
 
     @Test
-    fun `settings default to classic easy, the system theme and blue`() {
-        val settings = Settings()
-        settings.mode shouldBe GameMode(Variant.CLASSIC, Difficulty.EASY)
-        settings.themeColor shouldBe ThemeColor.BLUE
-        settings.themeMode shouldBe ThemeMode.SYSTEM
-        settings.dynamicColor shouldBe true
+    fun `settings default to classic easy`() {
+        Settings().mode shouldBe GameMode(Variant.CLASSIC, Difficulty.EASY)
     }
 }

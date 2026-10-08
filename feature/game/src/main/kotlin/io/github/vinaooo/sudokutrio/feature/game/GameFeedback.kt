@@ -1,6 +1,6 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
-import io.github.vinaooo.sudokutrio.domain.model.Settings
+import io.github.vinaooo.vinkit.core.AppSettings
 
 enum class FeedbackEvent { MOVE, REJECTED, WIN }
 
@@ -15,7 +15,7 @@ interface GameFeedback {
 }
 
 /** Plays [event] through the channels the player left on in [settings]. */
-internal fun GameFeedback.give(event: FeedbackEvent, settings: Settings) {
+internal fun GameFeedback.give(event: FeedbackEvent, settings: AppSettings) {
     if (settings.soundEnabled) sound(event)
     if (settings.hapticsEnabled) haptic(event)
 }
