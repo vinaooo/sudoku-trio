@@ -29,12 +29,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
-import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
 import io.github.vinaooo.sudokutrio.feature.game.GameUiState
 import io.github.vinaooo.sudokutrio.feature.game.R
 import io.github.vinaooo.sudokutrio.feature.game.board.completedDigits
+import io.github.vinaooo.vinkit.core.BoardAlignment
+import io.github.vinaooo.vinkit.core.PhoneViewSide
 
 @Composable
 internal fun PortraitGame(

@@ -7,12 +7,12 @@ import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Move
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers

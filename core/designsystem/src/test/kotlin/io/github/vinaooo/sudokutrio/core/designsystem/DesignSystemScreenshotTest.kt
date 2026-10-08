@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioThemeExtras
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
+import io.github.vinaooo.vinkit.core.ThemeMode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

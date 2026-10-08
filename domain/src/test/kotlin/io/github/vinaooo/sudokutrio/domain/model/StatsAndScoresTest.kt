@@ -1,6 +1,8 @@
 package io.github.vinaooo.sudokutrio.domain.model
 
 import io.github.vinaooo.sudokutrio.domain.mode
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 

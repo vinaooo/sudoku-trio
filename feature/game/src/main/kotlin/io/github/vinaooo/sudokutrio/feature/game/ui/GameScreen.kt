@@ -31,9 +31,6 @@ import androidx.compose.ui.unit.roundToIntRect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
-import io.github.vinaooo.sudokutrio.domain.model.Handedness
-import io.github.vinaooo.sudokutrio.domain.model.PhoneViewSide
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.feature.game.GameIntent
@@ -42,6 +39,9 @@ import io.github.vinaooo.sudokutrio.feature.game.GameViewModel
 import io.github.vinaooo.sudokutrio.feature.game.R
 import io.github.vinaooo.sudokutrio.feature.game.board.CellHighlighter
 import io.github.vinaooo.sudokutrio.feature.game.board.SudokuBoard
+import io.github.vinaooo.vinkit.core.BoardAlignment
+import io.github.vinaooo.vinkit.core.Handedness
+import io.github.vinaooo.vinkit.core.PhoneViewSide
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

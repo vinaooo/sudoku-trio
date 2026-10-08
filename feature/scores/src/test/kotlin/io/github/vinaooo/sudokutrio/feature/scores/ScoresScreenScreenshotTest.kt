@@ -8,8 +8,8 @@ import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.GameStats
 import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.core.ThemeMode
 import java.util.TimeZone
 import org.junit.Rule
 import org.junit.Test

@@ -1,18 +1,10 @@
 package io.github.vinaooo.sudokutrio.domain.model
 
-enum class ThemeMode { SYSTEM, LIGHT, DARK }
-
-/** The app's colors when dynamic color is off or not available; blue is Sudoku Trio's brand. */
-enum class ThemeColor { GREEN, TEAL, BLUE, INDIGO, PURPLE, PINK, RED, ORANGE }
-
-/** The hand the controls sit under. */
-enum class Handedness { LEFT, RIGHT }
-
-/** Where the board sits in the height it has, in portrait. */
-enum class BoardAlignment { TOP, BOTTOM }
-
-/** Where phone view's board sits across the room it has on a tablet. */
-enum class PhoneViewSide { LEFT, CENTER, RIGHT }
+import io.github.vinaooo.vinkit.core.BoardAlignment
+import io.github.vinaooo.vinkit.core.Handedness
+import io.github.vinaooo.vinkit.core.PhoneViewSide
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 
 data class Settings(
     /** The mode of the next new game; the game in progress keeps its own. */

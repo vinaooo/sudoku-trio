@@ -6,13 +6,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
-import io.github.vinaooo.sudokutrio.domain.model.BoardAlignment
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
-import io.github.vinaooo.sudokutrio.domain.model.Handedness
 import io.github.vinaooo.sudokutrio.domain.model.Settings
-import io.github.vinaooo.sudokutrio.domain.model.ThemeColor
-import io.github.vinaooo.sudokutrio.domain.model.ThemeMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.core.BoardAlignment
+import io.github.vinaooo.vinkit.core.Handedness
+import io.github.vinaooo.vinkit.core.ThemeColor
+import io.github.vinaooo.vinkit.core.ThemeMode
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.Rule
 import org.junit.Test
