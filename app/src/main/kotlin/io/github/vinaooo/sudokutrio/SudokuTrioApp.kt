@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.github.vinaooo.sudokutrio.core.ads.AdBannerProvider
 import io.github.vinaooo.sudokutrio.feature.game.ui.GameRoute as GameScreenRoute
 import io.github.vinaooo.sudokutrio.feature.scores.ScoresRoute as ScoresScreenRoute
 import io.github.vinaooo.sudokutrio.feature.settings.SettingsRoute as SettingsScreenRoute
 import io.github.vinaooo.sudokutrio.navigation.GameRoute
 import io.github.vinaooo.sudokutrio.navigation.ScoresRoute
 import io.github.vinaooo.sudokutrio.navigation.SettingsRoute
+import io.github.vinaooo.vinkit.ads.AdBannerProvider
 
 /** The navigation host. Only the game screen carries the ad banner, at its bottom; Scores and Settings have none. */
 @Composable
