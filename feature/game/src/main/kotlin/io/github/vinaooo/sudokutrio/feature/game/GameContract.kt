@@ -1,9 +1,9 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.vinkit.core.AppSettings
+import io.github.vinaooo.vinkit.core.ScoreRecord
 
 data class GameUiState(
     val session: GameSession? = null,

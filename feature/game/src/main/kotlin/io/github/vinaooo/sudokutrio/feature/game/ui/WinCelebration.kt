@@ -49,8 +49,10 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
+import io.github.vinaooo.sudokutrio.domain.model.hintsUsed
+import io.github.vinaooo.sudokutrio.domain.model.mistakes
 import io.github.vinaooo.sudokutrio.feature.game.R
+import io.github.vinaooo.vinkit.core.ScoreRecord
 import io.github.vinaooo.vinkit.core.formatElapsed
 import kotlin.math.PI
 import kotlin.math.abs

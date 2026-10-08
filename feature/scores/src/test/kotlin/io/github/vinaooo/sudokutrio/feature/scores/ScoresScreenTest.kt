@@ -7,9 +7,12 @@ import androidx.compose.ui.test.performClick
 import io.github.vinaooo.sudokutrio.core.designsystem.theme.SudokuTrioTheme
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.key
+import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.core.ScoreRecord
+import io.github.vinaooo.vinkit.scores.ModeSection
+import io.github.vinaooo.vinkit.scores.ScoresUiState
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.Rule
 import org.junit.Test
@@ -25,21 +28,28 @@ class ScoresScreenTest {
     private val killer = GameMode(Variant.KILLER, Difficulty.HARD)
 
     @Test
-    fun `tabs per mode, the stats read as items, and the back arrow`() {
-        val selected = mutableListOf<GameMode>()
+    fun `tabs per variant, the stats read as items, and the back arrow`() {
+        val selected = mutableListOf<String>()
         var back = 0
         compose.setContent {
             SudokuTrioTheme {
                 ScoresScreen(
                     ScoresUiState(
-                        scores = listOf(ScoreRecord(classic, 900, 65, 2, 1, NOON)),
-                        stats = GameStats(played = 4, won = 3),
                         isLoading = false,
-                        modes = listOf(classic, killer),
-                        mode = classic,
+                        groups = listOf("CLASSIC", "KILLER"),
+                        group = "CLASSIC",
+                        sections = listOf(
+                            ModeSection(
+                                classic.key,
+                                GameStats(played = 4, won = 3),
+                                listOf(
+                                    ScoreRecord(classic.key, 900, 65, NOON, mapOf("mistakes" to "2", "hints" to "1")),
+                                ),
+                            ),
+                        ),
                     ),
                     onBack = { back++ },
-                    onSelectMode = { selected += it },
+                    onSelectVariant = { selected += it },
                 )
             }
         }
@@ -47,8 +57,8 @@ class ScoresScreenTest {
         compose.onNodeWithText("2 mistakes · 1 hint", substring = true).assertExists()
         compose.onNodeWithContentDescription("Won, 3").assertExists()
         compose.onNodeWithContentDescription("Win rate, 75%").assertExists()
-        compose.onNodeWithText("Killer · Hard").performClick()
-        selected shouldContainExactly listOf(killer)
+        compose.onNodeWithText("Killer").performClick()
+        selected shouldContainExactly listOf("KILLER")
         compose.onNodeWithContentDescription("Back").performClick()
         listOf(back) shouldContainExactly listOf(1)
     }
@@ -59,16 +69,16 @@ class ScoresScreenTest {
             SudokuTrioTheme {
                 ScoresScreen(
                     ScoresUiState(
-                        stats = GameStats(played = 2),
                         isLoading = false,
-                        modes = listOf(killer),
-                        mode = killer,
+                        groups = listOf("KILLER"),
+                        group = "KILLER",
+                        sections = listOf(ModeSection(killer.key, GameStats(played = 2))),
                     ),
                     onBack = {},
                 )
             }
         }
-        compose.onNodeWithText("Killer · Hard").assertExists()
+        compose.onNodeWithText("Killer").assertExists()
         compose.onNodeWithContentDescription("Played, 2").assertExists()
         compose.onNodeWithText("Win a game to see your scores here.").assertExists()
     }

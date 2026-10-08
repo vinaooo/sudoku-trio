@@ -2,25 +2,26 @@ package io.github.vinaooo.sudokutrio.domain.usecase
 
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
-import io.github.vinaooo.sudokutrio.domain.model.GameStats
 import io.github.vinaooo.sudokutrio.domain.model.Puzzle
-import io.github.vinaooo.sudokutrio.domain.model.ScoreRecord
+import io.github.vinaooo.sudokutrio.domain.model.key
+import io.github.vinaooo.sudokutrio.domain.model.toRecord
 import io.github.vinaooo.sudokutrio.domain.repository.Clock
 import io.github.vinaooo.sudokutrio.domain.repository.SavedGameRepository
-import io.github.vinaooo.sudokutrio.domain.repository.ScoreRepository
 import io.github.vinaooo.sudokutrio.domain.repository.SeedSource
-import io.github.vinaooo.sudokutrio.domain.repository.StatsRepository
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
+import io.github.vinaooo.vinkit.core.GameStats
+import io.github.vinaooo.vinkit.core.ScoreRecord
+import io.github.vinaooo.vinkit.core.ScoreRepository
+import io.github.vinaooo.vinkit.core.StatsRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 /** Counts a saved game that was being played as a loss in its own mode, before another game replaces it. */
 class AbandonGame(private val savedGames: SavedGameRepository, private val stats: StatsRepository) {
     suspend operator fun invoke() {
         val saved = savedGames.load() ?: return
-        if (saved.isInProgress) stats.update(saved.state.mode, GameStats::afterLoss)
+        if (saved.isInProgress) stats.update(saved.state.mode.key, GameStats::afterLoss)
     }
 }
 
@@ -95,30 +96,10 @@ class FinishGame(
     suspend operator fun invoke(session: GameSession): ScoreRecord {
         val state = session.state
         check(state.isWon) { "Only a won game is finished." }
-        val record = ScoreRecord(
-            mode = state.mode,
-            points = state.score,
-            elapsedSeconds = state.elapsedSeconds,
-            mistakes = state.mistakes,
-            hintsUsed = state.hintsUsed,
-            playedAtMillis = clock.nowMillis(),
-        )
+        val record = state.toRecord(clock.nowMillis())
         scores.add(record)
-        stats.update(state.mode, GameStats::afterWin)
+        stats.update(state.mode.key, GameStats::afterWin)
         savedGames.clear()
         return record
     }
-}
-
-class ObserveTopScores(private val scores: ScoreRepository) {
-    operator fun invoke(mode: GameMode): Flow<List<ScoreRecord>> = scores.observeTopScores(mode)
-}
-
-/** The modes played at least once, for the Scores screen's tabs: a mode never won still shows its stats. */
-class ObservePlayedModes(private val stats: StatsRepository) {
-    operator fun invoke(): Flow<Set<GameMode>> = stats.observePlayedModes()
-}
-
-class ObserveStats(private val stats: StatsRepository) {
-    operator fun invoke(mode: GameMode): Flow<GameStats> = stats.observe(mode)
 }
