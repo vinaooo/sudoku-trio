@@ -16,15 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.vinaooo.sudokutrio.feature.game.badges.BadgesRoute as BadgesScreenRoute
 import io.github.vinaooo.sudokutrio.feature.game.ui.GameRoute as GameScreenRoute
 import io.github.vinaooo.sudokutrio.feature.scores.ScoresRoute as ScoresScreenRoute
 import io.github.vinaooo.sudokutrio.feature.settings.SettingsRoute as SettingsScreenRoute
+import io.github.vinaooo.sudokutrio.navigation.BadgesRoute
 import io.github.vinaooo.sudokutrio.navigation.GameRoute
 import io.github.vinaooo.sudokutrio.navigation.ScoresRoute
 import io.github.vinaooo.sudokutrio.navigation.SettingsRoute
 import io.github.vinaooo.vinkit.ads.AdBannerProvider
 
-/** The navigation host. Only the game screen carries the ad banner, at its bottom; Scores and Settings have none. */
+/**
+ * The navigation host. Only the game screen carries the ad banner, at its bottom; Badges, Scores and Settings have
+ * none.
+ */
 @Composable
 fun SudokuTrioApp(
     adBanner: AdBannerProvider,
@@ -46,11 +51,13 @@ fun SudokuTrioApp(
                     GameScreenRoute(
                         onOpenScores = { navController.navigate(ScoresRoute) },
                         onOpenSettings = { navController.navigate(SettingsRoute) },
+                        onOpenBadges = { navController.navigate(BadgesRoute) },
                     )
                 }
                 adBanner.Banner(Modifier.navigationBarsPadding())
             }
         }
+        composable<BadgesRoute> { BadgesScreenRoute(onBack = navController::popBackStack) }
         composable<ScoresRoute> { ScoresScreenRoute(onBack = navController::popBackStack) }
         composable<SettingsRoute> {
             SettingsScreenRoute(

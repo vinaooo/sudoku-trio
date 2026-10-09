@@ -1,11 +1,14 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
+import io.github.vinaooo.sudokutrio.domain.fake.FakeAchievementRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeAppSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeScoreRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeStatsRepository
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
+import io.github.vinaooo.sudokutrio.domain.model.Achievement
+import io.github.vinaooo.sudokutrio.domain.model.Achievements
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Hint
@@ -14,12 +17,14 @@ import io.github.vinaooo.sudokutrio.domain.model.Puzzle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
 import io.github.vinaooo.sudokutrio.domain.model.key
+import io.github.vinaooo.sudokutrio.domain.repository.Clock
 import io.github.vinaooo.sudokutrio.domain.rules.ConflictFinder
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.domain.usecase.AbandonGame
 import io.github.vinaooo.sudokutrio.domain.usecase.FinishGame
 import io.github.vinaooo.sudokutrio.domain.usecase.PreparePuzzle
+import io.github.vinaooo.sudokutrio.domain.usecase.RecordAchievements
 import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
@@ -33,6 +38,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import java.time.LocalDateTime
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -56,6 +62,7 @@ class GameViewModelTest {
     private val settings = FakeSettingsRepository()
     private val appSettings = FakeAppSettingsRepository()
     private val feedback = FakeGameFeedback()
+    private val badges = FakeAchievementRepository()
     private val engine = GameEngine()
 
     private val solution = (
@@ -95,14 +102,23 @@ class GameViewModelTest {
     }
 
     private fun TestScope.viewModel(search: kotlinx.coroutines.CoroutineDispatcher = dispatcher): GameViewModel {
-        val abandon = AbandonGame(savedGames, stats)
+        // Noon on a fixed day, whatever the machine's time zone, so no time-of-day badge sneaks in.
+        val clock = object : Clock {
+            override fun nowMillis() = 5_000L
+
+            override fun now() = LocalDateTime.of(2026, 10, 9, 12, 0)
+        }
+        val achievements = RecordAchievements(badges, stats, settings, clock)
+        val abandon = AbandonGame(savedGames, stats, achievements)
         return GameViewModel(
             startNewGame = StartNewGame(abandon, savedGames, generator, { 42L }, engine, dispatcher),
             preparePuzzle = PreparePuzzle(generator, { 43L }, dispatcher),
             restartGame = RestartGame(abandon, savedGames, engine),
             resumeGame = ResumeGame(savedGames),
             saveGame = SaveGame(savedGames),
-            finishGame = FinishGame(scores, stats, savedGames) { 5_000L },
+            finishGame = FinishGame(scores, stats, savedGames, achievements, clock),
+            recordAchievements = achievements,
+            achievements = badges,
             settingsRepository = settings,
             appSettingsRepository = appSettings,
             engine = engine,
@@ -396,5 +412,25 @@ class GameViewModelTest {
         vm.session.state.pendingHint.shouldNotBeNull()
         vm.session.state.elapsedSeconds shouldBe 1
         vm.session.state.score shouldBe start - 1 - 200
+    }
+
+    @Test
+    fun `a move marks the day played`() = gameTest {
+        val vm = viewModel()
+        play(vm, GameIntent.SelectCell(0), GameIntent.Digit(solution[0]))
+        badges.progress.value.collected[Achievements.DAYS_PLAYED] shouldBe setOf("2026-10-09")
+    }
+
+    @Test
+    fun `badges earned while playing are listed until shown, not the ones from before`() = gameTest {
+        badges.progress.value = badges.progress.value.copy(unlocked = setOf(Achievement.WON_1.name))
+        nextPuzzle = lastCell
+        val vm = viewModel()
+        play(vm, GameIntent.SelectCell(0), GameIntent.Digit(solution[0]))
+        vm.state.earned shouldContainExactly
+            listOf(Achievement.PLAYED_1, Achievement.WIN_CLASSIC, Achievement.FLAWLESS, Achievement.FAST_EASY)
+
+        play(vm, GameIntent.BadgesShown)
+        vm.state.earned shouldBe emptyList()
     }
 }

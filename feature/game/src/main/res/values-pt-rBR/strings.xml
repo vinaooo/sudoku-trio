@@ -45,4 +45,94 @@
     <string name="a11y_undone">Jogada desfeita</string>
     <string name="a11y_redone">Jogada refeita</string>
     <!-- Relatar bug -->
+
+    <!-- Badges -->
+    <string name="badge_earned">Medalha conquistada: %1$s</string>
+    <plurals name="badges_earned">
+        <item quantity="one">%d medalha conquistada</item>
+        <item quantity="many">%d medalhas conquistadas</item>
+        <item quantity="other">%d medalhas conquistadas</item>
+    </plurals>
+    <plurals name="badge_played_name">
+        <item quantity="one">%d partida</item>
+        <item quantity="many">%d partidas</item>
+        <item quantity="other">%d partidas</item>
+    </plurals>
+    <plurals name="badge_played_note">
+        <item quantity="one">Jogue %d partida</item>
+        <item quantity="many">Jogue %d partidas</item>
+        <item quantity="other">Jogue %d partidas</item>
+    </plurals>
+    <plurals name="badge_days_name">
+        <item quantity="one">%d dia</item>
+        <item quantity="many">%d dias seguidos</item>
+        <item quantity="other">%d dias seguidos</item>
+    </plurals>
+    <plurals name="badge_days_note">
+        <item quantity="one">Jogue em %d dia</item>
+        <item quantity="many">Jogue em %d dias seguidos</item>
+        <item quantity="other">Jogue em %d dias seguidos</item>
+    </plurals>
+    <plurals name="badge_won_name">
+        <item quantity="one">%d vitória</item>
+        <item quantity="many">%d vitórias</item>
+        <item quantity="other">%d vitórias</item>
+    </plurals>
+    <plurals name="badge_won_note">
+        <item quantity="one">Vença %d partida</item>
+        <item quantity="many">Vença %d partidas</item>
+        <item quantity="other">Vença %d partidas</item>
+    </plurals>
+    <plurals name="badge_streak_name">
+        <item quantity="one">%d vitória seguida</item>
+        <item quantity="many">%d vitórias seguidas</item>
+        <item quantity="other">%d vitórias seguidas</item>
+    </plurals>
+    <plurals name="badge_streak_note">
+        <item quantity="one">Vença %d partida seguida, em qualquer modo</item>
+        <item quantity="many">Vença %d partidas seguidas, em qualquer modo</item>
+        <item quantity="other">Vença %d partidas seguidas, em qualquer modo</item>
+    </plurals>
+    <string name="badge_win_classic_name">Vitória no Clássico</string>
+    <string name="badge_win_classic_note">Vença uma partida de Clássico</string>
+    <string name="badge_win_x_name">Vitória no Sudoku X</string>
+    <string name="badge_win_x_note">Vença uma partida de Sudoku X</string>
+    <string name="badge_win_killer_name">Vitória no Killer</string>
+    <string name="badge_win_killer_note">Vença uma partida de Killer</string>
+    <string name="badge_win_trio_name">Trio</string>
+    <string name="badge_win_trio_note">Vença nas três variantes</string>
+    <string name="badge_win_classic_expert_name">Especialista no Clássico</string>
+    <string name="badge_win_classic_expert_note">Vença uma partida de Clássico no Especialista</string>
+    <string name="badge_win_x_expert_name">Especialista no Sudoku X</string>
+    <string name="badge_win_x_expert_note">Vença uma partida de Sudoku X no Especialista</string>
+    <string name="badge_win_killer_expert_name">Especialista no Killer</string>
+    <string name="badge_win_killer_expert_note">Vença uma partida de Killer no Especialista</string>
+    <string name="badge_win_every_mode_name">Colecionador</string>
+    <string name="badge_win_every_mode_note">Vença cada variante em cada dificuldade</string>
+    <string name="badge_killer_master_name">Mestre do Killer</string>
+    <string name="badge_killer_master_note">Vença 10 partidas de Killer no Especialista</string>
+    <string name="badge_flawless_name">Sem erros</string>
+    <string name="badge_flawless_note">Vença uma partida sem errar</string>
+    <string name="badge_flawless_expert_name">Especialista sem erros</string>
+    <string name="badge_flawless_expert_note">Vença uma partida no Especialista sem errar</string>
+    <string name="badge_no_hints_name">Por conta própria</string>
+    <string name="badge_no_hints_note">Vença uma partida no Difícil ou Especialista sem dicas</string>
+    <string name="badge_perfect_name">Perfeito</string>
+    <string name="badge_perfect_note">Vença uma partida no Especialista sem errar e sem dicas</string>
+    <string name="badge_fast_easy_name">Largada rápida</string>
+    <string name="badge_fast_easy_note">Vença uma partida no Fácil em menos de 4 minutos</string>
+    <string name="badge_fast_medium_name">Ritmo firme</string>
+    <string name="badge_fast_medium_note">Vença uma partida no Médio em menos de 8 minutos</string>
+    <string name="badge_fast_hard_name">Mente afiada</string>
+    <string name="badge_fast_hard_note">Vença uma partida no Difícil em menos de 15 minutos</string>
+    <string name="badge_fast_expert_name">Relâmpago</string>
+    <string name="badge_fast_expert_note">Vença uma partida no Especialista em menos de 25 minutos</string>
+    <string name="badge_night_owl_name">Coruja</string>
+    <string name="badge_night_owl_note">Vença uma partida entre meia-noite e 5h</string>
+    <string name="badge_early_bird_name">Madrugador</string>
+    <string name="badge_early_bird_note">Vença uma partida entre 5h e 7h</string>
+    <string name="badge_marathon_name">Maratona</string>
+    <string name="badge_marathon_note">Vença 5 partidas em um dia</string>
+    <string name="badge_weekend_name">Fim de semana</string>
+    <string name="badge_weekend_note">Vença num sábado e no domingo seguinte</string>
 </resources>

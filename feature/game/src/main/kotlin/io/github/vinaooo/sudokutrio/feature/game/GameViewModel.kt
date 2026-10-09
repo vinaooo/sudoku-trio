@@ -3,9 +3,11 @@ package io.github.vinaooo.sudokutrio.feature.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.vinaooo.sudokutrio.domain.model.Achievement
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Hint
 import io.github.vinaooo.sudokutrio.domain.model.Move
+import io.github.vinaooo.sudokutrio.domain.model.badges
 import io.github.vinaooo.sudokutrio.domain.repository.SettingsRepository
 import io.github.vinaooo.sudokutrio.domain.rules.ConflictFinder
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
@@ -13,10 +15,12 @@ import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.sudokutrio.domain.usecase.FinishGame
 import io.github.vinaooo.sudokutrio.domain.usecase.PreparePuzzle
 import io.github.vinaooo.sudokutrio.domain.usecase.PreparedPuzzle
+import io.github.vinaooo.sudokutrio.domain.usecase.RecordAchievements
 import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
+import io.github.vinaooo.vinkit.core.AchievementRepository
 import io.github.vinaooo.vinkit.core.AppSettingsRepository
 import io.github.vinaooo.vinkit.shell.FeedbackEvent
 import io.github.vinaooo.vinkit.shell.GameFeedback
@@ -47,6 +51,8 @@ class GameViewModel @Inject constructor(
     private val resumeGame: ResumeGame,
     private val saveGame: SaveGame,
     private val finishGame: FinishGame,
+    private val recordAchievements: RecordAchievements,
+    achievements: AchievementRepository,
     private val settingsRepository: SettingsRepository,
     private val appSettingsRepository: AppSettingsRepository,
     private val engine: GameEngine,
@@ -79,6 +85,15 @@ class GameViewModel @Inject constructor(
         viewModelScope.launch {
             appSettingsRepository.settings.collect { settings -> state.update { it.copy(appSettings = settings) } }
         }
+        viewModelScope.launch {
+            // Badges unlocked from now on are shown; the ones already earned when the screen opened are not.
+            var known: Set<Achievement>? = null
+            achievements.progress.map { it.badges }.distinctUntilChanged().collect { now ->
+                val new = known?.let { now - it }.orEmpty()
+                known = now
+                if (new.isNotEmpty()) state.update { it.copy(earned = it.earned + new) }
+            }
+        }
         generation = viewModelScope.launch {
             val resumed = resumeGame()
             show(resumed ?: startNewGame(settingsRepository.settings.first().mode))
@@ -104,6 +119,7 @@ class GameViewModel @Inject constructor(
             GameIntent.Hint -> hint()
             GameIntent.NewGame -> newGame()
             GameIntent.Restart -> restart()
+            GameIntent.BadgesShown -> state.update { it.copy(earned = emptyList()) }
             GameIntent.Resume -> clock.start()
             GameIntent.Pause -> pause()
         }
@@ -140,7 +156,10 @@ class GameViewModel @Inject constructor(
             }
         } else {
             feedback.give(FeedbackEvent.MOVE, state.value.appSettings)
-            viewModelScope.launch { saveGame(next) }
+            viewModelScope.launch {
+                saveGame(next)
+                recordAchievements.played()
+            }
         }
     }
 

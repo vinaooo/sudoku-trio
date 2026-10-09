@@ -45,4 +45,85 @@
     <string name="a11y_undone">Move undone</string>
     <string name="a11y_redone">Move redone</string>
     <!-- Bug report -->
+
+    <!-- Badges -->
+    <string name="badge_earned">Badge earned: %1$s</string>
+    <plurals name="badges_earned">
+        <item quantity="one">%d badge earned</item>
+        <item quantity="other">%d badges earned</item>
+    </plurals>
+    <plurals name="badge_played_name">
+        <item quantity="one">%d game</item>
+        <item quantity="other">%d games</item>
+    </plurals>
+    <plurals name="badge_played_note">
+        <item quantity="one">Play %d game</item>
+        <item quantity="other">Play %d games</item>
+    </plurals>
+    <plurals name="badge_days_name">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days in a row</item>
+    </plurals>
+    <plurals name="badge_days_note">
+        <item quantity="one">Play on %d day</item>
+        <item quantity="other">Play on %d days in a row</item>
+    </plurals>
+    <plurals name="badge_won_name">
+        <item quantity="one">%d win</item>
+        <item quantity="other">%d wins</item>
+    </plurals>
+    <plurals name="badge_won_note">
+        <item quantity="one">Win %d game</item>
+        <item quantity="other">Win %d games</item>
+    </plurals>
+    <plurals name="badge_streak_name">
+        <item quantity="one">%d win in a row</item>
+        <item quantity="other">%d wins in a row</item>
+    </plurals>
+    <plurals name="badge_streak_note">
+        <item quantity="one">Win %d game in a row, in any mode</item>
+        <item quantity="other">Win %d games in a row, in any mode</item>
+    </plurals>
+    <string name="badge_win_classic_name">Classic win</string>
+    <string name="badge_win_classic_note">Win a Classic game</string>
+    <string name="badge_win_x_name">Sudoku X win</string>
+    <string name="badge_win_x_note">Win a Sudoku X game</string>
+    <string name="badge_win_killer_name">Killer win</string>
+    <string name="badge_win_killer_note">Win a Killer game</string>
+    <string name="badge_win_trio_name">Trio</string>
+    <string name="badge_win_trio_note">Win in all three variants</string>
+    <string name="badge_win_classic_expert_name">Classic expert</string>
+    <string name="badge_win_classic_expert_note">Win a Classic game on Expert</string>
+    <string name="badge_win_x_expert_name">Sudoku X expert</string>
+    <string name="badge_win_x_expert_note">Win a Sudoku X game on Expert</string>
+    <string name="badge_win_killer_expert_name">Killer expert</string>
+    <string name="badge_win_killer_expert_note">Win a Killer game on Expert</string>
+    <string name="badge_win_every_mode_name">Completionist</string>
+    <string name="badge_win_every_mode_note">Win every variant at every difficulty</string>
+    <string name="badge_killer_master_name">Killer master</string>
+    <string name="badge_killer_master_note">Win 10 Killer games on Expert</string>
+    <string name="badge_flawless_name">Flawless</string>
+    <string name="badge_flawless_note">Win a game without a mistake</string>
+    <string name="badge_flawless_expert_name">Flawless expert</string>
+    <string name="badge_flawless_expert_note">Win a game on Expert without a mistake</string>
+    <string name="badge_no_hints_name">On my own</string>
+    <string name="badge_no_hints_note">Win a game on Hard or Expert without a hint</string>
+    <string name="badge_perfect_name">Perfect</string>
+    <string name="badge_perfect_note">Win a game on Expert without a mistake or a hint</string>
+    <string name="badge_fast_easy_name">Quick start</string>
+    <string name="badge_fast_easy_note">Win a game on Easy in under 4 minutes</string>
+    <string name="badge_fast_medium_name">Steady pace</string>
+    <string name="badge_fast_medium_note">Win a game on Medium in under 8 minutes</string>
+    <string name="badge_fast_hard_name">Sharp mind</string>
+    <string name="badge_fast_hard_note">Win a game on Hard in under 15 minutes</string>
+    <string name="badge_fast_expert_name">Lightning</string>
+    <string name="badge_fast_expert_note">Win a game on Expert in under 25 minutes</string>
+    <string name="badge_night_owl_name">Night owl</string>
+    <string name="badge_night_owl_note">Win a game between midnight and 5 a.m.</string>
+    <string name="badge_early_bird_name">Early bird</string>
+    <string name="badge_early_bird_note">Win a game between 5 and 7 a.m.</string>
+    <string name="badge_marathon_name">Marathon</string>
+    <string name="badge_marathon_note">Win 5 games in one day</string>
+    <string name="badge_weekend_name">Weekend player</string>
+    <string name="badge_weekend_note">Win on a Saturday and on the Sunday after it</string>
 </resources>

@@ -8,23 +8,38 @@ import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.repository.Clock
 import io.github.vinaooo.sudokutrio.domain.repository.SavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.repository.SeedSource
+import io.github.vinaooo.sudokutrio.domain.repository.SettingsRepository
 import io.github.vinaooo.sudokutrio.domain.rules.GameEngine
 import io.github.vinaooo.sudokutrio.domain.usecase.AbandonGame
 import io.github.vinaooo.sudokutrio.domain.usecase.FinishGame
 import io.github.vinaooo.sudokutrio.domain.usecase.PreparePuzzle
+import io.github.vinaooo.sudokutrio.domain.usecase.RecordAchievements
 import io.github.vinaooo.sudokutrio.domain.usecase.RestartGame
 import io.github.vinaooo.sudokutrio.domain.usecase.ResumeGame
 import io.github.vinaooo.sudokutrio.domain.usecase.SaveGame
 import io.github.vinaooo.sudokutrio.domain.usecase.StartNewGame
+import io.github.vinaooo.vinkit.core.AchievementRepository
 import io.github.vinaooo.vinkit.core.ScoreRepository
 import io.github.vinaooo.vinkit.core.StatsRepository
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 
 /** Domain use cases, wired to the data layer's repositories. */
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
-    @Provides fun abandonGame(savedGames: SavedGameRepository, stats: StatsRepository) = AbandonGame(savedGames, stats)
+    @Provides
+    @Singleton
+    fun recordAchievements(
+        achievements: AchievementRepository,
+        stats: StatsRepository,
+        settings: SettingsRepository,
+        clock: Clock,
+    ) = RecordAchievements(achievements, stats, settings, clock)
+
+    @Provides
+    fun abandonGame(savedGames: SavedGameRepository, stats: StatsRepository, achievements: RecordAchievements) =
+        AbandonGame(savedGames, stats, achievements)
 
     /** Puzzles are generated on [Dispatchers.Default]: it takes a moment and works the CPU. */
     @Provides
@@ -49,6 +64,11 @@ object UseCaseModule {
     @Provides fun saveGame(savedGames: SavedGameRepository) = SaveGame(savedGames)
 
     @Provides
-    fun finishGame(scores: ScoreRepository, stats: StatsRepository, savedGames: SavedGameRepository, clock: Clock) =
-        FinishGame(scores, stats, savedGames, clock)
+    fun finishGame(
+        scores: ScoreRepository,
+        stats: StatsRepository,
+        savedGames: SavedGameRepository,
+        achievements: RecordAchievements,
+        clock: Clock,
+    ) = FinishGame(scores, stats, savedGames, achievements, clock)
 }

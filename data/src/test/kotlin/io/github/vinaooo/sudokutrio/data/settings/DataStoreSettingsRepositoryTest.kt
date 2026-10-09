@@ -37,8 +37,8 @@ class DataStoreSettingsRepositoryTest {
     }
 
     @Test
-    fun `the next game's mode is persisted`() = scope.runTest {
-        val changed = Settings(mode = GameMode(Variant.KILLER, Difficulty.EXPERT))
+    fun `the next game's mode and the win streak are persisted`() = scope.runTest {
+        val changed = Settings(mode = GameMode(Variant.KILLER, Difficulty.EXPERT), winStreak = 4)
         repository().update { changed }
 
         repository().settings.first() shouldBe changed

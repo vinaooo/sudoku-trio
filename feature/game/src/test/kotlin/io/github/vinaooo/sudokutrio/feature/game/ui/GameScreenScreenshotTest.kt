@@ -52,9 +52,18 @@ class GameScreenScreenshotTest {
 
     private fun GameSession.then(vararg moves: Move) = moves.fold(this) { s, m -> s.play(m, engine)!! }
 
-    private fun capture(name: String, state: GameUiState, themeMode: ThemeMode = ThemeMode.LIGHT) {
+    /** [buttons]: the Badges, Scores and Settings buttons beside the mode and clock, as in the app. */
+    private fun capture(
+        name: String,
+        state: GameUiState,
+        themeMode: ThemeMode = ThemeMode.LIGHT,
+        buttons: Boolean = false,
+    ) {
+        val open = {}.takeIf { buttons }
         compose.setContent {
-            SudokuTrioTheme(themeMode = themeMode, dynamicColor = false) { GameScreen(state, {}) }
+            SudokuTrioTheme(themeMode = themeMode, dynamicColor = false) {
+                GameScreen(state, {}, onOpenScores = open, onOpenSettings = open, onOpenBadges = open)
+            }
         }
         compose.onRoot().captureRoboImage("src/test/screenshots/$name.png")
     }
@@ -110,7 +119,7 @@ class GameScreenScreenshotTest {
     @Config(qualifiers = "w360dp-h640dp-port-xhdpi")
     fun classic_light_short_phone_hint() {
         val hinted = session(Variant.CLASSIC) { it == 76 }.then(Move.RevealHint)
-        capture("classic_light_short_phone_hint", ui(hinted, selected = 76))
+        capture("classic_light_short_phone_hint", ui(hinted, selected = 76), buttons = true)
     }
 
     @Test
@@ -148,6 +157,7 @@ class GameScreenScreenshotTest {
     @Test
     @Config(qualifiers = "pt-rBR-w411dp-h891dp-port-xxhdpi")
     fun x_light_hint_pt_br() {
-        capture("x_light_hint_pt_br", ui(session(Variant.X) { it % 3 == 0 }.then(Move.RevealHint), selected = null))
+        val hinted = session(Variant.X) { it % 3 == 0 }.then(Move.RevealHint)
+        capture("x_light_hint_pt_br", ui(hinted, selected = null), buttons = true)
     }
 }
