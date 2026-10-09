@@ -19,3 +19,6 @@ enum class Difficulty { EASY, MEDIUM, HARD, EXPERT }
 /** The variant and difficulty a game was dealt with. It travels with the game, whatever Settings say later. */
 @Serializable
 data class GameMode(val variant: Variant, val difficulty: Difficulty)
+
+/** Every mode, variant by variant from easy to expert. */
+val allModes: List<GameMode> = Variant.entries.flatMap { variant -> Difficulty.entries.map { GameMode(variant, it) } }

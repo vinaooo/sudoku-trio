@@ -17,11 +17,20 @@ import io.github.vinaooo.vinkit.core.StatsRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-/** Counts a saved game that was being played as a loss in its own mode, before another game replaces it. */
-class AbandonGame(private val savedGames: SavedGameRepository, private val stats: StatsRepository) {
+/**
+ * Counts a saved game that was being played as a loss in its own mode, before another game replaces it; the loss
+ * ends the win streak of the badges.
+ */
+class AbandonGame(
+    private val savedGames: SavedGameRepository,
+    private val stats: StatsRepository,
+    private val achievements: RecordAchievements,
+) {
     suspend operator fun invoke() {
         val saved = savedGames.load() ?: return
-        if (saved.isInProgress) stats.update(saved.state.mode.key, GameStats::afterLoss)
+        if (!saved.isInProgress) return
+        stats.update(saved.state.mode.key, GameStats::afterLoss)
+        achievements.gameEnded(saved.state)
     }
 }
 
@@ -86,11 +95,12 @@ class SaveGame(private val savedGames: SavedGameRepository) {
     suspend operator fun invoke(session: GameSession) = savedGames.save(session)
 }
 
-/** Records a won game: its score in its mode's ranking and the win in its stats; the saved game goes. */
+/** Records a won game: its score in its mode's ranking, the win in its stats and the badges; the saved game goes. */
 class FinishGame(
     private val scores: ScoreRepository,
     private val stats: StatsRepository,
     private val savedGames: SavedGameRepository,
+    private val achievements: RecordAchievements,
     private val clock: Clock,
 ) {
     suspend operator fun invoke(session: GameSession): ScoreRecord {
@@ -99,6 +109,7 @@ class FinishGame(
         val record = state.toRecord(clock.nowMillis())
         scores.add(record)
         stats.update(state.mode.key, GameStats::afterWin)
+        achievements.gameEnded(state)
         savedGames.clear()
         return record
     }

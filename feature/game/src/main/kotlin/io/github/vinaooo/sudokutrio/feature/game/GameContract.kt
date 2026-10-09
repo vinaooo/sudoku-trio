@@ -1,5 +1,6 @@
 package io.github.vinaooo.sudokutrio.feature.game
 
+import io.github.vinaooo.sudokutrio.domain.model.Achievement
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.vinkit.core.AppSettings
@@ -19,6 +20,8 @@ data class GameUiState(
     val conflicts: Set<Int> = emptySet(),
     val winRecord: ScoreRecord? = null,
     val announcement: Announced? = null,
+    /** Badges just unlocked, to show once no dialog covers the game. */
+    val earned: List<Achievement> = emptyList(),
 )
 
 sealed interface GameIntent {
@@ -41,6 +44,9 @@ sealed interface GameIntent {
     data object NewGame : GameIntent
 
     data object Restart : GameIntent
+
+    /** The badges just earned were shown. */
+    data object BadgesShown : GameIntent
 
     /** Handled by the screen, which captures the board first. */
 

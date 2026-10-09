@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,6 +32,8 @@ import io.github.vinaooo.sudokutrio.feature.game.GameUiState
 import io.github.vinaooo.sudokutrio.feature.game.GameViewModel
 import io.github.vinaooo.sudokutrio.feature.game.R
 import io.github.vinaooo.sudokutrio.feature.game.SudokuTrioReports
+import io.github.vinaooo.sudokutrio.feature.game.badges.BadgesEarned
+import io.github.vinaooo.sudokutrio.feature.game.badges.badgesButton
 import io.github.vinaooo.sudokutrio.feature.game.board.CellHighlighter
 import io.github.vinaooo.sudokutrio.feature.game.board.SudokuBoard
 import io.github.vinaooo.sudokutrio.feature.game.board.completedDigits
@@ -41,12 +45,16 @@ import io.github.vinaooo.vinkit.shell.GameToolbar
 import io.github.vinaooo.vinkit.shell.ModeAndTime
 import io.github.vinaooo.vinkit.shell.WinDialog
 
-/** The game screen. The Scores and Settings buttons show only when their screens exist ([onOpenScores] non-null). */
+/**
+ * The game screen. The Badges, Scores and Settings buttons show only when their screens exist ([onOpenScores]
+ * non-null).
+ */
 @Composable
 fun GameRoute(
     modifier: Modifier = Modifier,
     onOpenScores: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
+    onOpenBadges: (() -> Unit)? = null,
     viewModel: GameViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,7 +62,7 @@ fun GameRoute(
         viewModel.onIntent(GameIntent.Resume)
         onPauseOrDispose { viewModel.onIntent(GameIntent.Pause) }
     }
-    GameScreen(uiState, viewModel::onIntent, modifier, onOpenScores, onOpenSettings)
+    GameScreen(uiState, viewModel::onIntent, modifier, onOpenScores, onOpenSettings, onOpenBadges)
 }
 
 /**
@@ -68,7 +76,10 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     onOpenScores: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
+    onOpenBadges: (() -> Unit)? = null,
 ) {
+    val snackbar = remember { SnackbarHostState() }
+    BadgesEarned(uiState, snackbar) { onIntent(GameIntent.BadgesShown) }
     val announced = uiState.announcement
     GameSurface(
         announcement = announced?.let { announcementText(it.announcement) },
@@ -78,23 +89,27 @@ fun GameScreen(
         gameReport = { gameReport(uiState.settings, uiState.appSettings, uiState.session) },
     ) { reportBug ->
         val controls = remember(uiState) { uiState.controls() }
-        GameFrame(
-            settings = uiState.appSettings,
-            info = { GameInfo(uiState, it) },
-            board = { BoardOrLoading(uiState, onIntent) },
-            toolbar = { frame ->
-                GameToolbar(
-                    actions = toolbarActions(controls.toolbar, onIntent),
-                    menuOptions = menuOptions(onIntent),
-                    onReportBug = reportBug,
-                    vertical = frame.landscape,
-                    mirrored = frame.mirrored,
-                )
-            },
-            controls = { frame -> Pad(controls, onIntent, frame) },
-            onOpenScores = onOpenScores,
-            onOpenSettings = onOpenSettings,
-        )
+        Box {
+            GameFrame(
+                settings = uiState.appSettings,
+                info = { GameInfo(uiState, it) },
+                board = { BoardOrLoading(uiState, onIntent) },
+                toolbar = { frame ->
+                    GameToolbar(
+                        actions = toolbarActions(controls.toolbar, onIntent),
+                        menuOptions = menuOptions(onIntent),
+                        onReportBug = reportBug,
+                        vertical = frame.landscape,
+                        mirrored = frame.mirrored,
+                    )
+                },
+                controls = { frame -> Pad(controls, onIntent, frame) },
+                onOpenScores = onOpenScores,
+                onOpenSettings = onOpenSettings,
+                navigation = badgesButton(onOpenBadges),
+            )
+            SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(bottom = SNACKBAR_SPACE))
+        }
     }
     uiState.winRecord?.let { WinDialog(winLines(it), onNewGame = { onIntent(GameIntent.NewGame) }) }
 }
@@ -201,6 +216,9 @@ internal fun Board(session: GameSession, selected: Int?, conflicts: Set<Int>, on
 }
 
 internal const val BOARD_TAG = "board"
+
+/** The snackbar sits above the toolbar. */
+private val SNACKBAR_SPACE = 88.dp
 internal val PAD_WIDTH = 184.dp
 
 /** On a tablet, landscape's pad has room for bigger keys. */

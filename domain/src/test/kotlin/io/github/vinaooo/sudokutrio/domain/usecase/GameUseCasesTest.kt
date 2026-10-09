@@ -1,14 +1,19 @@
 package io.github.vinaooo.sudokutrio.domain.usecase
 
 import io.github.vinaooo.sudokutrio.domain.SOLUTION
+import io.github.vinaooo.sudokutrio.domain.fake.FakeAchievementRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeSavedGameRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeScoreRepository
+import io.github.vinaooo.sudokutrio.domain.fake.FakeSettingsRepository
 import io.github.vinaooo.sudokutrio.domain.fake.FakeStatsRepository
 import io.github.vinaooo.sudokutrio.domain.generator.PuzzleGenerator
 import io.github.vinaooo.sudokutrio.domain.mode
+import io.github.vinaooo.sudokutrio.domain.model.Achievement
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.Move
+import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.sudokutrio.domain.model.badges
 import io.github.vinaooo.sudokutrio.domain.model.hintsUsed
 import io.github.vinaooo.sudokutrio.domain.model.key
 import io.github.vinaooo.sudokutrio.domain.model.mistakes
@@ -20,6 +25,7 @@ import io.github.vinaooo.sudokutrio.domain.session.GameSession
 import io.github.vinaooo.vinkit.core.GameStats
 import io.github.vinaooo.vinkit.core.ScoreRecord
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -38,7 +44,10 @@ class GameUseCasesTest {
         generated += mode to seed
         puzzle()
     }
-    private val abandon = AbandonGame(saved, stats)
+    private val badges = FakeAchievementRepository()
+    private val settings = FakeSettingsRepository(Settings(winStreak = 3))
+    private val achievements = RecordAchievements(badges, stats, settings) { 0L }
+    private val abandon = AbandonGame(saved, stats, achievements)
 
     private fun inProgress(variant: Variant = Variant.X) =
         GameSession(9, newState(variant)).play(Move.ToggleNote(0, 1), engine).shouldNotBeNull()
@@ -62,6 +71,8 @@ class GameUseCasesTest {
         stats.observe(mode(Variant.X).key).first() shouldBe GameStats(played = 1)
         stats.observe(mode().key).first() shouldBe GameStats()
         stats.observePlayedModes().first() shouldBe setOf(mode(Variant.X).key)
+        settings.settings.value.winStreak shouldBe 0
+        badges.progress.value.badges shouldBe setOf(Achievement.PLAYED_1)
     }
 
     @Test
@@ -72,6 +83,7 @@ class GameUseCasesTest {
         saved.saved = won
         abandon()
         stats.stats.value shouldBe emptyMap()
+        settings.settings.value.winStreak shouldBe 3
     }
 
     @Test
@@ -100,7 +112,7 @@ class GameUseCasesTest {
         val won = GameSession(2, newState(empty = listOf(0)).copy(mistakes = 2, hintsUsed = 1))
             .tick(30, engine).play(Move.Place(0, SOLUTION[0]), engine).shouldNotBeNull()
         saved.saved = won
-        val record = FinishGame(scores, stats, saved) { 1234L }(won)
+        val record = FinishGame(scores, stats, saved, achievements) { 1234L }(won)
         record shouldBe ScoreRecord(mode().key, won.state.score, 30, 1234, mapOf("mistakes" to "2", "hints" to "1"))
         record.mistakes shouldBe 2
         record.hintsUsed shouldBe 1
@@ -109,11 +121,14 @@ class GameUseCasesTest {
         saved.saved.shouldBeNull()
         scores.observeTopScores(mode().key, mode().ranking()).first() shouldBe listOf(record)
         stats.observePlayedModes().first() shouldBe setOf(mode().key)
+        settings.settings.value.winStreak shouldBe 4
+        badges.progress.value.badges shouldContainAll
+            setOf(Achievement.PLAYED_1, Achievement.WON_1, Achievement.STREAK_3, Achievement.WIN_CLASSIC)
     }
 
     @Test
     fun `only a won game can be finished`() = runTest {
-        shouldThrow<IllegalStateException> { FinishGame(scores, stats, saved) { 0L }(inProgress()) }
+        shouldThrow<IllegalStateException> { FinishGame(scores, stats, saved, achievements) { 0L }(inProgress()) }
     }
 
     @Test
