@@ -57,8 +57,8 @@ internal fun BadgesEarned(uiState: GameUiState, snackbar: SnackbarHostState, onS
     val covered = uiState.winRecord != null || uiState.loading
     val text = when (earned.size) {
         0 -> null
-        1 -> stringResource(R.string.badge_earned, badge(earned.single()).name)
-        else -> pluralStringResource(R.plurals.badges_earned, earned.size, earned.size)
+        1 -> stringResource(AchievementsR.string.vinkit_new_badge, badge(earned.single()).name)
+        else -> pluralStringResource(AchievementsR.plurals.vinkit_new_badges, earned.size, earned.size)
     }
     LaunchedEffect(text, covered) {
         // Cleared once shown: clearing first would change the key and cancel the snackbar.
@@ -70,10 +70,10 @@ internal fun BadgesEarned(uiState: GameUiState, snackbar: SnackbarHostState, onS
 }
 
 private val LADDER_TEXT = mapOf(
-    Ladder.PLAYED to (R.plurals.badge_played_name to R.plurals.badge_played_note),
+    Ladder.PLAYED to (AchievementsR.plurals.vinkit_badge_played to R.plurals.badge_played_note),
     Ladder.DAYS to (R.plurals.badge_days_name to R.plurals.badge_days_note),
-    Ladder.WON to (R.plurals.badge_won_name to R.plurals.badge_won_note),
-    Ladder.STREAK to (R.plurals.badge_streak_name to R.plurals.badge_streak_note),
+    Ladder.WON to (AchievementsR.plurals.vinkit_badge_won to R.plurals.badge_won_note),
+    Ladder.STREAK to (AchievementsR.plurals.vinkit_badge_streak to R.plurals.badge_streak_note),
 )
 
 private val BADGE_TEXT = mapOf(
@@ -89,7 +89,7 @@ private val BADGE_TEXT = mapOf(
     Achievement.KILLER_MASTER to (R.string.badge_killer_master_name to R.string.badge_killer_master_note),
     Achievement.FLAWLESS to (R.string.badge_flawless_name to R.string.badge_flawless_note),
     Achievement.FLAWLESS_EXPERT to (R.string.badge_flawless_expert_name to R.string.badge_flawless_expert_note),
-    Achievement.NO_HINTS to (R.string.badge_no_hints_name to R.string.badge_no_hints_note),
+    Achievement.NO_HINTS to (AchievementsR.string.vinkit_badge_no_hints to R.string.badge_no_hints_note),
     Achievement.PERFECT to (R.string.badge_perfect_name to R.string.badge_perfect_note),
     Achievement.FAST_EASY to (R.string.badge_fast_easy_name to R.string.badge_fast_easy_note),
     Achievement.FAST_MEDIUM to (R.string.badge_fast_medium_name to R.string.badge_fast_medium_note),

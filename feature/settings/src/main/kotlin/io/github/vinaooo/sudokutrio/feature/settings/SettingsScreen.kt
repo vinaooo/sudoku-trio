@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.vinkit.core.AppSettings
 import io.github.vinaooo.vinkit.settings.NewGameConfirmDialog
+import io.github.vinaooo.vinkit.settings.R as SettingsR
 import io.github.vinaooo.vinkit.settings.SettingsScreen as VinkitSettingsScreen
 import io.github.vinaooo.vinkit.settings.SettingsSection
 
@@ -62,7 +63,7 @@ fun SettingsScreen(
         onOpenPrivacyPolicy = onOpenPrivacyPolicy,
         modifier = modifier,
         gameSections = listOf(
-            SettingsSection(stringResource(R.string.section_game)) { GameSection(settings, onChange) },
+            SettingsSection(stringResource(SettingsR.string.vinkit_section_game)) { GameSection(settings, onChange) },
         ),
         privacyOptionsRequired = privacyOptionsRequired,
         onOpenPrivacyOptions = onOpenPrivacyOptions,

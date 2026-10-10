@@ -1,16 +1,9 @@
 <resources>
-    <string name="undo">Undo</string>
-    <string name="redo">Redo</string>
-    <string name="hint">Hint</string>
     <string name="apply_hint">Apply the hint</string>
     <string name="erase">Erase</string>
     <string name="notes">Notes</string>
     <string name="digit_complete">%1$d, all placed</string>
-    <string name="new_game">New game</string>
-    <string name="restart_board">Restart this board</string>
     <string name="generating">Making a new puzzle</string>
-    <string name="win_score">Score: %1$d</string>
-    <string name="win_time">Time: %1$s</string>
     <string name="win_mistakes">Mistakes: %1$d</string>
     <string name="win_hints">Hints: %1$d</string>
     <!-- Hints -->
@@ -42,20 +35,9 @@
     <string name="a11y_cell_empty">empty</string>
     <string name="a11y_cell_conflict">repeated</string>
     <string name="a11y_cell_cage">cage of %1$d</string>
-    <string name="a11y_undone">Move undone</string>
-    <string name="a11y_redone">Move redone</string>
     <!-- Bug report -->
 
     <!-- Badges -->
-    <string name="badge_earned">Badge earned: %1$s</string>
-    <plurals name="badges_earned">
-        <item quantity="one">%d badge earned</item>
-        <item quantity="other">%d badges earned</item>
-    </plurals>
-    <plurals name="badge_played_name">
-        <item quantity="one">%d game</item>
-        <item quantity="other">%d games</item>
-    </plurals>
     <plurals name="badge_played_note">
         <item quantity="one">Play %d game</item>
         <item quantity="other">Play %d games</item>
@@ -68,21 +50,13 @@
         <item quantity="one">Play on %d day</item>
         <item quantity="other">Play on %d days in a row</item>
     </plurals>
-    <plurals name="badge_won_name">
-        <item quantity="one">%d win</item>
-        <item quantity="other">%d wins</item>
-    </plurals>
     <plurals name="badge_won_note">
         <item quantity="one">Win %d game</item>
         <item quantity="other">Win %d games</item>
     </plurals>
-    <plurals name="badge_streak_name">
-        <item quantity="one">%d win in a row</item>
-        <item quantity="other">%d wins in a row</item>
-    </plurals>
     <plurals name="badge_streak_note">
-        <item quantity="one">Win %d game in a row, in any mode</item>
-        <item quantity="other">Win %d games in a row, in any mode</item>
+        <item quantity="one">Win %d game in a row, in any variant or difficulty</item>
+        <item quantity="other">Win %d games in a row, in any variant or difficulty</item>
     </plurals>
     <string name="badge_win_classic_name">Classic win</string>
     <string name="badge_win_classic_note">Win a Classic game</string>
@@ -106,7 +80,6 @@
     <string name="badge_flawless_note">Win a game without a mistake</string>
     <string name="badge_flawless_expert_name">Flawless expert</string>
     <string name="badge_flawless_expert_note">Win a game on Expert without a mistake</string>
-    <string name="badge_no_hints_name">On my own</string>
     <string name="badge_no_hints_note">Win a game on Hard or Expert without a hint</string>
     <string name="badge_perfect_name">Perfect</string>
     <string name="badge_perfect_note">Win a game on Expert without a mistake or a hint</string>

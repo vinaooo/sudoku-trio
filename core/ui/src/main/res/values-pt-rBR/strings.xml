@@ -2,9 +2,6 @@
     <string name="variant_classic">Clássico</string>
     <string name="variant_x">Sudoku X</string>
     <string name="variant_killer">Killer</string>
-    <string name="difficulty_easy">Fácil</string>
-    <string name="difficulty_medium">Médio</string>
-    <string name="difficulty_hard">Difícil</string>
     <string name="difficulty_expert">Especialista</string>
     <string name="mode_name">%1$s · %2$s</string>
 </resources>

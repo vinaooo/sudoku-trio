@@ -1,7 +1,5 @@
 <resources>
-    <string name="section_game">Jogo</string>
     <string name="variant">Variante</string>
-    <string name="difficulty">Dificuldade</string>
     <string name="difficulty_easy_note">Basta o candidato único, com muitas dicas iniciais</string>
     <string name="difficulty_medium_note">Menos números iniciais; pares e candidatos travados ajudam</string>
     <string name="difficulty_hard_note">Resoluções longas, com trios e X-wings</string>
