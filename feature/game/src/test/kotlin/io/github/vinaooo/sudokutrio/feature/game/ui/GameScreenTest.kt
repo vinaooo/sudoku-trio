@@ -111,7 +111,7 @@ class GameScreenTest {
     fun `the new game menu starts a new game or restarts this one`() {
         show(ready())
         compose.onNodeWithContentDescription("New game").performClick()
-        compose.onNodeWithText("Restart this board").performClick()
+        compose.onNodeWithText("Restart this game").performClick()
         compose.onNodeWithContentDescription("New game").performClick()
         compose.waitForIdle()
         compose.onNodeWithText("New game").performClick()

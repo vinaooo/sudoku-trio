@@ -5,6 +5,7 @@ import androidx.compose.ui.res.stringResource
 import io.github.vinaooo.sudokutrio.domain.model.Grid
 import io.github.vinaooo.sudokutrio.feature.game.Announcement
 import io.github.vinaooo.sudokutrio.feature.game.R
+import io.github.vinaooo.vinkit.shell.R as ShellR
 
 @Composable
 internal fun announcementText(announcement: Announcement): String = when (announcement) {
@@ -15,8 +16,8 @@ internal fun announcementText(announcement: Announcement): String = when (announ
         announcement.digit,
         cellName(announcement.cell),
     )
-    Announcement.Undone -> stringResource(R.string.a11y_undone)
-    Announcement.Redone -> stringResource(R.string.a11y_redone)
+    Announcement.Undone -> stringResource(ShellR.string.vinkit_undone)
+    Announcement.Redone -> stringResource(ShellR.string.vinkit_redone)
     is Announcement.Hinted -> hintTitle(announcement.hint) + ". " + hintBody(announcement.hint)
 }
 

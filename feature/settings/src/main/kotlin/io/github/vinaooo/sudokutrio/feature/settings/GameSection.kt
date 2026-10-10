@@ -11,6 +11,7 @@ import io.github.vinaooo.sudokutrio.core.ui.label
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.Settings
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.designsystem.R as DesignR
 import io.github.vinaooo.vinkit.settings.Choice
 import io.github.vinaooo.vinkit.settings.IconChoice
 import io.github.vinaooo.vinkit.settings.IconOption
@@ -26,7 +27,7 @@ internal fun GameSection(settings: Settings, onChange: (SettingsChange) -> Unit)
     )
     // Four levels take icons, as the standard says; TalkBack reads each one's name.
     IconChoice(
-        title = stringResource(R.string.difficulty),
+        title = stringResource(DesignR.string.vinkit_difficulty),
         options = Difficulty.entries.map {
             IconOption(it, icons.getValue(it), stringResource(it.label), stringResource(descriptions.getValue(it)))
         },

@@ -29,6 +29,7 @@ import io.github.vinaooo.sudokutrio.feature.game.R
 import io.github.vinaooo.vinkit.core.ScoreRecord
 import io.github.vinaooo.vinkit.core.formatElapsed
 import io.github.vinaooo.vinkit.shell.MenuOption
+import io.github.vinaooo.vinkit.shell.R as ShellR
 import io.github.vinaooo.vinkit.shell.ToolbarAction
 
 /** The hint on show: what it is about and what the second tap does. */
@@ -64,13 +65,13 @@ internal data class ToolbarState(
 internal fun toolbarActions(state: ToolbarState, onIntent: (GameIntent) -> Unit): List<ToolbarAction> = listOf(
     ToolbarAction.Button(
         Icons.AutoMirrored.Rounded.Undo,
-        stringResource(R.string.undo),
+        stringResource(ShellR.string.vinkit_undo),
         enabled = state.enabled && state.canUndo,
         keepDirection = true,
     ) { onIntent(GameIntent.Undo) },
     ToolbarAction.Button(
         Icons.AutoMirrored.Rounded.Redo,
-        stringResource(R.string.redo),
+        stringResource(ShellR.string.vinkit_redo),
         enabled = state.enabled && state.canRedo,
         keepDirection = true,
     ) { onIntent(GameIntent.Redo) },
@@ -87,7 +88,11 @@ internal fun toolbarActions(state: ToolbarState, onIntent: (GameIntent) -> Unit)
             onIntent(GameIntent.Hint)
         }
     } else {
-        ToolbarAction.Button(Icons.Rounded.Lightbulb, stringResource(R.string.hint), enabled = state.enabled) {
+        ToolbarAction.Button(
+            Icons.Rounded.Lightbulb,
+            stringResource(ShellR.string.vinkit_hint),
+            enabled = state.enabled,
+        ) {
             onIntent(GameIntent.Hint)
         }
     },
@@ -96,15 +101,15 @@ internal fun toolbarActions(state: ToolbarState, onIntent: (GameIntent) -> Unit)
 /** The new game menu: a new puzzle, or this board again from its givens. */
 @Composable
 internal fun menuOptions(onIntent: (GameIntent) -> Unit): List<MenuOption> = listOf(
-    MenuOption(Icons.Rounded.GridOn, stringResource(R.string.new_game)) { onIntent(GameIntent.NewGame) },
-    MenuOption(Icons.Rounded.Refresh, stringResource(R.string.restart_board)) { onIntent(GameIntent.Restart) },
+    MenuOption(Icons.Rounded.GridOn, stringResource(ShellR.string.vinkit_new_game)) { onIntent(GameIntent.NewGame) },
+    MenuOption(Icons.Rounded.Refresh, stringResource(ShellR.string.vinkit_restart)) { onIntent(GameIntent.Restart) },
 )
 
 /** The win dialog's lines: the score, mistakes and hints show only now, so mistakes stay silent during play. */
 @Composable
 internal fun winLines(record: ScoreRecord): List<String> = listOf(
-    stringResource(R.string.win_score, record.points),
-    stringResource(R.string.win_time, formatElapsed(record.elapsedSeconds)),
+    stringResource(ShellR.string.vinkit_win_score, record.points),
+    stringResource(ShellR.string.vinkit_win_time, formatElapsed(record.elapsedSeconds)),
     stringResource(R.string.win_mistakes, record.mistakes),
     stringResource(R.string.win_hints, record.hintsUsed),
 )

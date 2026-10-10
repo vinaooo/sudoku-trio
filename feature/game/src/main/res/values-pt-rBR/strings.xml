@@ -1,16 +1,9 @@
 <resources>
-    <string name="undo">Desfazer</string>
-    <string name="redo">Refazer</string>
-    <string name="hint">Dica</string>
     <string name="apply_hint">Aplicar a dica</string>
     <string name="erase">Apagar</string>
     <string name="notes">Anotações</string>
     <string name="digit_complete">%1$d, todos colocados</string>
-    <string name="new_game">Novo jogo</string>
-    <string name="restart_board">Recomeçar este tabuleiro</string>
     <string name="generating">Criando um novo quebra-cabeça</string>
-    <string name="win_score">Pontuação: %1$d</string>
-    <string name="win_time">Tempo: %1$s</string>
     <string name="win_mistakes">Erros: %1$d</string>
     <string name="win_hints">Dicas: %1$d</string>
     <!-- Dicas -->
@@ -42,22 +35,9 @@
     <string name="a11y_cell_empty">vazia</string>
     <string name="a11y_cell_conflict">repetido</string>
     <string name="a11y_cell_cage">gaiola de %1$d</string>
-    <string name="a11y_undone">Jogada desfeita</string>
-    <string name="a11y_redone">Jogada refeita</string>
     <!-- Relatar bug -->
 
     <!-- Badges -->
-    <string name="badge_earned">Medalha conquistada: %1$s</string>
-    <plurals name="badges_earned">
-        <item quantity="one">%d medalha conquistada</item>
-        <item quantity="many">%d medalhas conquistadas</item>
-        <item quantity="other">%d medalhas conquistadas</item>
-    </plurals>
-    <plurals name="badge_played_name">
-        <item quantity="one">%d partida</item>
-        <item quantity="many">%d partidas</item>
-        <item quantity="other">%d partidas</item>
-    </plurals>
     <plurals name="badge_played_note">
         <item quantity="one">Jogue %d partida</item>
         <item quantity="many">Jogue %d partidas</item>
@@ -73,25 +53,15 @@
         <item quantity="many">Jogue em %d dias seguidos</item>
         <item quantity="other">Jogue em %d dias seguidos</item>
     </plurals>
-    <plurals name="badge_won_name">
-        <item quantity="one">%d vitória</item>
-        <item quantity="many">%d vitórias</item>
-        <item quantity="other">%d vitórias</item>
-    </plurals>
     <plurals name="badge_won_note">
         <item quantity="one">Vença %d partida</item>
         <item quantity="many">Vença %d partidas</item>
         <item quantity="other">Vença %d partidas</item>
     </plurals>
-    <plurals name="badge_streak_name">
-        <item quantity="one">%d vitória seguida</item>
-        <item quantity="many">%d vitórias seguidas</item>
-        <item quantity="other">%d vitórias seguidas</item>
-    </plurals>
     <plurals name="badge_streak_note">
-        <item quantity="one">Vença %d partida seguida, em qualquer modo</item>
-        <item quantity="many">Vença %d partidas seguidas, em qualquer modo</item>
-        <item quantity="other">Vença %d partidas seguidas, em qualquer modo</item>
+        <item quantity="one">Vença %d partida seguida, em qualquer variante ou dificuldade</item>
+        <item quantity="many">Vença %d partidas seguidas, em qualquer variante ou dificuldade</item>
+        <item quantity="other">Vença %d partidas seguidas, em qualquer variante ou dificuldade</item>
     </plurals>
     <string name="badge_win_classic_name">Vitória no Clássico</string>
     <string name="badge_win_classic_note">Vença uma partida de Clássico</string>
@@ -115,7 +85,6 @@
     <string name="badge_flawless_note">Vença uma partida sem errar</string>
     <string name="badge_flawless_expert_name">Especialista sem erros</string>
     <string name="badge_flawless_expert_note">Vença uma partida no Especialista sem errar</string>
-    <string name="badge_no_hints_name">Por conta própria</string>
     <string name="badge_no_hints_note">Vença uma partida no Difícil ou Especialista sem dicas</string>
     <string name="badge_perfect_name">Perfeito</string>
     <string name="badge_perfect_note">Vença uma partida no Especialista sem errar e sem dicas</string>

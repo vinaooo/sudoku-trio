@@ -6,6 +6,7 @@ import androidx.compose.ui.res.stringResource
 import io.github.vinaooo.sudokutrio.domain.model.Difficulty
 import io.github.vinaooo.sudokutrio.domain.model.GameMode
 import io.github.vinaooo.sudokutrio.domain.model.Variant
+import io.github.vinaooo.vinkit.designsystem.R as DesignR
 
 @get:StringRes
 val Variant.label: Int
@@ -18,9 +19,9 @@ val Variant.label: Int
 @get:StringRes
 val Difficulty.label: Int
     get() = when (this) {
-        Difficulty.EASY -> R.string.difficulty_easy
-        Difficulty.MEDIUM -> R.string.difficulty_medium
-        Difficulty.HARD -> R.string.difficulty_hard
+        Difficulty.EASY -> DesignR.string.vinkit_difficulty_easy
+        Difficulty.MEDIUM -> DesignR.string.vinkit_difficulty_medium
+        Difficulty.HARD -> DesignR.string.vinkit_difficulty_hard
         Difficulty.EXPERT -> R.string.difficulty_expert
     }
 

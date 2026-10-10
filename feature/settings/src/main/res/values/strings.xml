@@ -1,7 +1,5 @@
 <resources>
-    <string name="section_game">Game</string>
     <string name="variant">Variant</string>
-    <string name="difficulty">Difficulty</string>
     <string name="difficulty_easy_note">Singles are enough, with plenty of givens</string>
     <string name="difficulty_medium_note">Fewer givens; pairs and locked candidates help</string>
     <string name="difficulty_hard_note">Long solves with triples and X-wings</string>
