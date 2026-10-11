@@ -16,6 +16,7 @@ import io.github.vinaooo.vinkit.ads.AdBannerProvider
 import io.github.vinaooo.vinkit.ads.AdConsent
 import io.github.vinaooo.vinkit.core.AppSettings
 import io.github.vinaooo.vinkit.core.AppSettingsRepository
+import io.github.vinaooo.vinkit.core.ThemeColor
 import io.github.vinaooo.vinkit.designsystem.isDarkTheme
 import javax.inject.Inject
 
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
         // Once per launch, not again when the activity is recreated (rotation, theme change).
         if (savedInstanceState == null) adConsent.gather(this)
         setContent {
-            val settings by appSettings.settings.collectAsStateWithLifecycle(AppSettings())
+            val settings by appSettings.settings.collectAsStateWithLifecycle(AppSettings(themeColor = ThemeColor.BLUE))
             val darkTheme = isDarkTheme(settings.themeMode, isSystemInDarkTheme())
             LaunchedEffect(darkTheme) {
                 // System bar icons follow the in-app theme choice, not only the system's.

@@ -27,7 +27,7 @@
     <string name="a11y_board">Sudoku board</string>
     <string name="a11y_cell">row %1$d, column %2$d</string>
     <string name="a11y_placed">%1$d in %2$s</string>
-    <string name="a11y_erased">%1$s cleared</string>
+    <string name="a11y_erased">%1$s erased</string>
     <string name="a11y_note_added">Note %1$d added in %2$s</string>
     <string name="a11y_note_removed">Note %1$d removed from %2$s</string>
     <string name="a11y_cell_given">%1$d, given</string>
